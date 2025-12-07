@@ -11,19 +11,6 @@
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     
-    <style>
-        body { font-family: 'Inter', sans-serif; }
-        .tool-card { transition: all 0.3s ease; }
-        .tool-card:hover { transform: translateY(-5px); box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.15); }
-        .smooth-scroll { scroll-behavior: smooth; }
-        
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: #f1f1f1; }
-        ::-webkit-scrollbar-thumb { background: #2563eb; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #1d4ed8; }
-    </style>
-    
     <script>
         tailwind.config = {
             theme: {
@@ -33,7 +20,7 @@
                             50: '#eff6ff',
                             100: '#dbeafe',
                             500: '#3b82f6',
-                            600: '#2563eb', // Primary Brand Color
+                            600: '#2563eb', // Brand Color
                             700: '#1d4ed8',
                             900: '#1e3a8a',
                         }
@@ -42,44 +29,47 @@
             }
         }
     </script>
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
+        .tool-card { transition: all 0.3s ease; }
+        .tool-card:hover { transform: translateY(-5px); box-shadow: 0 10px 25px -5px rgba(37, 99, 235, 0.15); border-color: #2563eb; }
+        .smooth-scroll { scroll-behavior: smooth; }
+        
+        /* Modal Animation */
+        #toolModal { transition: opacity 0.2s ease-in-out; }
+        .hidden-modal { opacity: 0; pointer-events: none; }
+        .show-modal { opacity: 1; pointer-events: auto; }
+    </style>
 </head>
-<body class="bg-gray-50 text-gray-800 smooth-scroll">
+<body class="text-slate-800 smooth-scroll">
 
     <!-- TOP HEADER -->
-    <header class="bg-white shadow-md sticky top-0 z-50">
+    <header class="bg-white shadow-sm sticky top-0 z-40 border-b border-gray-100">
         <div class="container mx-auto px-4 py-4 flex justify-between items-center">
             <!-- Logo -->
-            <a href="#" class="flex items-center gap-2 text-2xl font-bold text-chronos-600">
+            <a href="#" class="flex items-center gap-2 text-2xl font-bold text-chronos-700">
                 <i class="fa-solid fa-layer-group"></i>
-                <span>Chronos Multi Tools</span>
+                <span>Chronos Tools</span>
             </a>
 
-            <!-- Navigation (Desktop) -->
-            <nav class="hidden md:flex gap-8 font-medium text-gray-600">
+            <!-- Navigation -->
+            <nav class="hidden md:flex gap-8 font-medium text-slate-600">
                 <a href="#" class="hover:text-chronos-600 transition">Home</a>
                 <a href="#tools-section" class="hover:text-chronos-600 transition">Tools</a>
                 <a href="mailto:hupboys@gmail.com" class="hover:text-chronos-600 transition">Contact</a>
             </nav>
-
-            <!-- Mobile Menu Button -->
-            <button class="md:hidden text-gray-600 text-2xl">
-                <i class="fa-solid fa-bars"></i>
-            </button>
+            
+            <!-- Mobile Menu Icon -->
+            <button class="md:hidden text-slate-600 text-2xl"><i class="fa-solid fa-bars"></i></button>
         </div>
     </header>
 
     <!-- HERO SECTION -->
     <section class="bg-gradient-to-br from-chronos-900 to-chronos-600 text-white py-20 text-center relative overflow-hidden">
-        <!-- Abstract Background Shape -->
-        <div class="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none">
-            <i class="fa-solid fa-gear absolute top-10 left-10 text-9xl animate-spin-slow"></i>
-            <i class="fa-solid fa-code absolute bottom-10 right-10 text-9xl"></i>
-        </div>
-
         <div class="container mx-auto px-4 relative z-10">
             <h1 class="text-4xl md:text-5xl font-bold mb-4 leading-tight">Your Daily Tools, All in One Place</h1>
             <p class="text-lg md:text-xl text-chronos-100 mb-8 max-w-2xl mx-auto">Convert, calculate, compress, and simplify your everyday tasks — fast and free.</p>
-            <a href="#tools-section" class="inline-block bg-white text-chronos-700 font-semibold py-3 px-8 rounded-full shadow-lg hover:bg-gray-100 transition transform hover:scale-105">
+            <a href="#tools-section" class="inline-block bg-white text-chronos-700 font-bold py-3 px-8 rounded-full shadow-lg hover:bg-gray-100 transition transform hover:scale-105">
                 Explore Tools
             </a>
         </div>
@@ -87,191 +77,132 @@
 
     <!-- SEARCH BAR -->
     <div class="container mx-auto px-4 -mt-8 relative z-20">
-        <div class="bg-white p-4 rounded-xl shadow-xl max-w-3xl mx-auto flex items-center border border-gray-100">
-            <i class="fa-solid fa-magnifying-glass text-gray-400 ml-3"></i>
-            <input type="text" id="toolSearch" placeholder="Search a tool (e.g., PDF, Image, Calculator)..." 
-                   class="w-full p-3 outline-none text-gray-700 text-lg placeholder-gray-400">
+        <div class="bg-white p-2 rounded-2xl shadow-xl max-w-2xl mx-auto flex items-center border border-gray-100">
+            <div class="p-3 text-gray-400"><i class="fa-solid fa-magnifying-glass text-xl"></i></div>
+            <input type="text" id="toolSearch" placeholder="Search for tools (e.g. PDF, Image, Calculator)..." 
+                   class="w-full p-3 outline-none text-gray-700 text-lg placeholder-gray-400 rounded-xl">
         </div>
     </div>
 
     <!-- MAIN TOOLS CONTAINER -->
     <main id="tools-section" class="container mx-auto px-4 py-16 space-y-16">
 
-        <!-- 1. Image Tools -->
+        <!-- 1. IMAGE TOOLS -->
         <section class="tool-category">
-            <div class="mb-6 border-l-4 border-chronos-600 pl-4">
-                <h2 class="text-2xl font-bold text-gray-800">🖼 Image Tools</h2>
-                <p class="text-gray-500">Edit, convert, and optimize your images instantly.</p>
-            </div>
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 card-grid">
-                <!-- Tool Cards will be repeated structure -->
-                <div class="tool-card bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex flex-col items-start">
-                    <div class="bg-chronos-50 p-3 rounded-lg text-chronos-600 mb-4"><i class="fa-solid fa-arrows-rotate text-xl"></i></div>
-                    <h3 class="font-bold text-lg mb-2">Image Converter</h3>
-                    <p class="text-sm text-gray-500 mb-4 flex-grow">Convert between JPG, PNG, WEBP, and more.</p>
-                    <a href="#" class="text-chronos-600 font-semibold text-sm hover:underline">Use Tool &rarr;</a>
+            <div class="flex items-center gap-3 mb-6 border-b pb-2 border-gray-200">
+                <div class="bg-blue-100 text-blue-600 p-2 rounded-lg"><i class="fa-solid fa-image"></i></div>
+                <div>
+                    <h2 class="text-2xl font-bold text-gray-800">Image Tools</h2>
+                    <p class="text-sm text-gray-500">Edit, convert, and optimize images.</p>
                 </div>
-                <div class="tool-card bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex flex-col items-start">
-                    <div class="bg-chronos-50 p-3 rounded-lg text-chronos-600 mb-4"><i class="fa-solid fa-compress text-xl"></i></div>
-                    <h3 class="font-bold text-lg mb-2">Image Compressor</h3>
-                    <p class="text-sm text-gray-500 mb-4 flex-grow">Reduce file size without losing quality.</p>
-                    <a href="#" class="text-chronos-600 font-semibold text-sm hover:underline">Use Tool &rarr;</a>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- Tool Cards -->
+                <div class="tool-card bg-white p-5 rounded-xl shadow-sm border border-gray-100 cursor-pointer" onclick="openTool('imgConvert')"><h3 class="font-bold text-lg mb-1">Image Converter</h3><p class="text-xs text-gray-500 mb-3">JPG, PNG, WEBP conversion.</p><span class="text-chronos-600 text-sm font-semibold">Use Tool &rarr;</span></div>
+                <div class="tool-card bg-white p-5 rounded-xl shadow-sm border border-gray-100 cursor-pointer"><h3 class="font-bold text-lg mb-1">Image Compressor</h3><p class="text-xs text-gray-500 mb-3">Reduce file size.</p><span class="text-chronos-600 text-sm font-semibold">Use Tool &rarr;</span></div>
+                <div class="tool-card bg-white p-5 rounded-xl shadow-sm border border-gray-100 cursor-pointer"><h3 class="font-bold text-lg mb-1">Image Resizer</h3><p class="text-xs text-gray-500 mb-3">Change dimensions.</p><span class="text-chronos-600 text-sm font-semibold">Use Tool &rarr;</span></div>
+                <div class="tool-card bg-white p-5 rounded-xl shadow-sm border border-gray-100 cursor-pointer"><h3 class="font-bold text-lg mb-1">Image Cropper</h3><p class="text-xs text-gray-500 mb-3">Crop to specific ratio.</p><span class="text-chronos-600 text-sm font-semibold">Use Tool &rarr;</span></div>
+                <div class="tool-card bg-white p-5 rounded-xl shadow-sm border border-gray-100 cursor-pointer"><h3 class="font-bold text-lg mb-1">Image to Text (OCR)</h3><p class="text-xs text-gray-500 mb-3">Extract text from image.</p><span class="text-chronos-600 text-sm font-semibold">Use Tool &rarr;</span></div>
+                <div class="tool-card bg-white p-5 rounded-xl shadow-sm border border-gray-100 cursor-pointer"><h3 class="font-bold text-lg mb-1">Remove Background</h3><p class="text-xs text-gray-500 mb-3">Make transparent background.</p><span class="text-chronos-600 text-sm font-semibold">Use Tool &rarr;</span></div>
+            </div>
+        </section>
+
+        <!-- 2. AUDIO & VIDEO -->
+        <section class="tool-category">
+            <div class="flex items-center gap-3 mb-6 border-b pb-2 border-gray-200">
+                <div class="bg-red-100 text-red-600 p-2 rounded-lg"><i class="fa-solid fa-video"></i></div>
+                <div>
+                    <h2 class="text-2xl font-bold text-gray-800">Audio & Video</h2>
+                    <p class="text-sm text-gray-500">Compress and clean media files.</p>
                 </div>
-                <!-- Adding rest of Image Tools -->
-                <div class="tool-card bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex flex-col items-start"><div class="bg-chronos-50 p-3 rounded-lg text-chronos-600 mb-4"><i class="fa-solid fa-expand text-xl"></i></div><h3 class="font-bold text-lg mb-2">Image Resizer</h3><p class="text-sm text-gray-500 mb-4 flex-grow">Change image dimensions easily.</p><a href="#" class="text-chronos-600 font-semibold text-sm hover:underline">Use Tool &rarr;</a></div>
-                <div class="tool-card bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex flex-col items-start"><div class="bg-chronos-50 p-3 rounded-lg text-chronos-600 mb-4"><i class="fa-solid fa-crop text-xl"></i></div><h3 class="font-bold text-lg mb-2">Image Cropper</h3><p class="text-sm text-gray-500 mb-4 flex-grow">Crop images to exact ratios.</p><a href="#" class="text-chronos-600 font-semibold text-sm hover:underline">Use Tool &rarr;</a></div>
-                <div class="tool-card bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex flex-col items-start"><div class="bg-chronos-50 p-3 rounded-lg text-chronos-600 mb-4"><i class="fa-solid fa-font text-xl"></i></div><h3 class="font-bold text-lg mb-2">Image to Text (OCR)</h3><p class="text-sm text-gray-500 mb-4 flex-grow">Extract text from images.</p><a href="#" class="text-chronos-600 font-semibold text-sm hover:underline">Use Tool &rarr;</a></div>
-                <div class="tool-card bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex flex-col items-start"><div class="bg-chronos-50 p-3 rounded-lg text-chronos-600 mb-4"><i class="fa-solid fa-rotate-right text-xl"></i></div><h3 class="font-bold text-lg mb-2">Image Rotator/Flipper</h3><p class="text-sm text-gray-500 mb-4 flex-grow">Rotate or flip images.</p><a href="#" class="text-chronos-600 font-semibold text-sm hover:underline">Use Tool &rarr;</a></div>
-                <div class="tool-card bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex flex-col items-start"><div class="bg-chronos-50 p-3 rounded-lg text-chronos-600 mb-4"><i class="fa-solid fa-eraser text-xl"></i></div><h3 class="font-bold text-lg mb-2">Remove Background</h3><p class="text-sm text-gray-500 mb-4 flex-grow">Make image backgrounds transparent.</p><a href="#" class="text-chronos-600 font-semibold text-sm hover:underline">Use Tool &rarr;</a></div>
-                <div class="tool-card bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex flex-col items-start"><div class="bg-chronos-50 p-3 rounded-lg text-chronos-600 mb-4"><i class="fa-solid fa-image text-xl"></i></div><h3 class="font-bold text-lg mb-2">Change Background</h3><p class="text-sm text-gray-500 mb-4 flex-grow">Replace image backgrounds.</p><a href="#" class="text-chronos-600 font-semibold text-sm hover:underline">Use Tool &rarr;</a></div>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div class="tool-card bg-white p-5 rounded-xl shadow-sm border border-gray-100 cursor-pointer"><h3 class="font-bold text-lg mb-1">Audio Compress</h3><p class="text-xs text-gray-500 mb-3">Shrink audio size.</p><span class="text-chronos-600 text-sm font-semibold">Use Tool &rarr;</span></div>
+                <div class="tool-card bg-white p-5 rounded-xl shadow-sm border border-gray-100 cursor-pointer"><h3 class="font-bold text-lg mb-1">Audio Noise Clean</h3><p class="text-xs text-gray-500 mb-3">Remove background noise.</p><span class="text-chronos-600 text-sm font-semibold">Use Tool &rarr;</span></div>
+                <div class="tool-card bg-white p-5 rounded-xl shadow-sm border border-gray-100 cursor-pointer"><h3 class="font-bold text-lg mb-1">Video Compress</h3><p class="text-xs text-gray-500 mb-3">Reduce video size.</p><span class="text-chronos-600 text-sm font-semibold">Use Tool &rarr;</span></div>
             </div>
         </section>
 
-        <!-- 2. Audio & Video Tools -->
+        <!-- 3. DOCUMENT TOOLS -->
         <section class="tool-category">
-            <div class="mb-6 border-l-4 border-chronos-600 pl-4">
-                <h2 class="text-2xl font-bold text-gray-800">🎥 Audio & Video Tools</h2>
-                <p class="text-gray-500">Manage your media files efficiently.</p>
-            </div>
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 card-grid">
-                <div class="tool-card bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex flex-col items-start">
-                    <div class="bg-chronos-50 p-3 rounded-lg text-chronos-600 mb-4"><i class="fa-solid fa-file-audio text-xl"></i></div>
-                    <h3 class="font-bold text-lg mb-2">Audio Compress</h3>
-                    <p class="text-sm text-gray-500 mb-4 flex-grow">Reduce audio file size.</p>
-                    <a href="#" class="text-chronos-600 font-semibold text-sm hover:underline">Use Tool &rarr;</a>
+            <div class="flex items-center gap-3 mb-6 border-b pb-2 border-gray-200">
+                <div class="bg-orange-100 text-orange-600 p-2 rounded-lg"><i class="fa-solid fa-file-pdf"></i></div>
+                <div>
+                    <h2 class="text-2xl font-bold text-gray-800">Document Tools</h2>
+                    <p class="text-sm text-gray-500">Manage PDFs and Docs.</p>
                 </div>
-                <div class="tool-card bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex flex-col items-start"><div class="bg-chronos-50 p-3 rounded-lg text-chronos-600 mb-4"><i class="fa-solid fa-wand-magic-sparkles text-xl"></i></div><h3 class="font-bold text-lg mb-2">Audio Clean</h3><p class="text-sm text-gray-500 mb-4 flex-grow">Enhance audio quality.</p><a href="#" class="text-chronos-600 font-semibold text-sm hover:underline">Use Tool &rarr;</a></div>
-                <div class="tool-card bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex flex-col items-start"><div class="bg-chronos-50 p-3 rounded-lg text-chronos-600 mb-4"><i class="fa-solid fa-volume-xmark text-xl"></i></div><h3 class="font-bold text-lg mb-2">Audio Clean Noise</h3><p class="text-sm text-gray-500 mb-4 flex-grow">Remove background noise.</p><a href="#" class="text-chronos-600 font-semibold text-sm hover:underline">Use Tool &rarr;</a></div>
-                <div class="tool-card bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex flex-col items-start"><div class="bg-chronos-50 p-3 rounded-lg text-chronos-600 mb-4"><i class="fa-solid fa-video text-xl"></i></div><h3 class="font-bold text-lg mb-2">Video Compress</h3><p class="text-sm text-gray-500 mb-4 flex-grow">Shrink video files.</p><a href="#" class="text-chronos-600 font-semibold text-sm hover:underline">Use Tool &rarr;</a></div>
-                <div class="tool-card bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex flex-col items-start"><div class="bg-chronos-50 p-3 rounded-lg text-chronos-600 mb-4"><i class="fa-solid fa-sliders text-xl"></i></div><h3 class="font-bold text-lg mb-2">Video Quality Manage</h3><p class="text-sm text-gray-500 mb-4 flex-grow">Adjust video resolution.</p><a href="#" class="text-chronos-600 font-semibold text-sm hover:underline">Use Tool &rarr;</a></div>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div class="tool-card bg-white p-5 rounded-xl shadow-sm border border-gray-100 cursor-pointer"><h3 class="font-bold text-lg mb-1">PDF to Word</h3><p class="text-xs text-gray-500 mb-3">Convert PDF to Docx.</p><span class="text-chronos-600 text-sm font-semibold">Use Tool &rarr;</span></div>
+                <div class="tool-card bg-white p-5 rounded-xl shadow-sm border border-gray-100 cursor-pointer"><h3 class="font-bold text-lg mb-1">Word to PDF</h3><p class="text-xs text-gray-500 mb-3">Convert Docx to PDF.</p><span class="text-chronos-600 text-sm font-semibold">Use Tool &rarr;</span></div>
+                <div class="tool-card bg-white p-5 rounded-xl shadow-sm border border-gray-100 cursor-pointer"><h3 class="font-bold text-lg mb-1">PDF Merger</h3><p class="text-xs text-gray-500 mb-3">Combine multiple PDFs.</p><span class="text-chronos-600 text-sm font-semibold">Use Tool &rarr;</span></div>
+                <div class="tool-card bg-white p-5 rounded-xl shadow-sm border border-gray-100 cursor-pointer"><h3 class="font-bold text-lg mb-1">PDF Lock/Unlock</h3><p class="text-xs text-gray-500 mb-3">Password protect PDF.</p><span class="text-chronos-600 text-sm font-semibold">Use Tool &rarr;</span></div>
             </div>
         </section>
 
-        <!-- 3. Document Tools -->
+        <!-- 4. CALCULATORS -->
         <section class="tool-category">
-            <div class="mb-6 border-l-4 border-chronos-600 pl-4">
-                <h2 class="text-2xl font-bold text-gray-800">📄 Document Tools</h2>
-                <p class="text-gray-500">Handle PDFs and documents with ease.</p>
-            </div>
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 card-grid">
-                <div class="tool-card bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex flex-col items-start">
-                    <div class="bg-chronos-50 p-3 rounded-lg text-chronos-600 mb-4"><i class="fa-solid fa-file-pdf text-xl"></i></div>
-                    <h3 class="font-bold text-lg mb-2">PDF Converter</h3>
-                    <p class="text-sm text-gray-500 mb-4 flex-grow">PDF to Word & Word to PDF.</p>
-                    <a href="#" class="text-chronos-600 font-semibold text-sm hover:underline">Use Tool &rarr;</a>
+            <div class="flex items-center gap-3 mb-6 border-b pb-2 border-gray-200">
+                <div class="bg-green-100 text-green-600 p-2 rounded-lg"><i class="fa-solid fa-calculator"></i></div>
+                <div>
+                    <h2 class="text-2xl font-bold text-gray-800">Calculators</h2>
+                    <p class="text-sm text-gray-500">Math, Health, and Finance.</p>
                 </div>
-                <div class="tool-card bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex flex-col items-start"><div class="bg-chronos-50 p-3 rounded-lg text-chronos-600 mb-4"><i class="fa-solid fa-file-zipper text-xl"></i></div><h3 class="font-bold text-lg mb-2">PDF Compressor</h3><p class="text-sm text-gray-500 mb-4 flex-grow">Reduce PDF file size.</p><a href="#" class="text-chronos-600 font-semibold text-sm hover:underline">Use Tool &rarr;</a></div>
-                <div class="tool-card bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex flex-col items-start"><div class="bg-chronos-50 p-3 rounded-lg text-chronos-600 mb-4"><i class="fa-solid fa-copy text-xl"></i></div><h3 class="font-bold text-lg mb-2">PDF Merger & Splitter</h3><p class="text-sm text-gray-500 mb-4 flex-grow">Combine or separate PDF pages.</p><a href="#" class="text-chronos-600 font-semibold text-sm hover:underline">Use Tool &rarr;</a></div>
-                <div class="tool-card bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex flex-col items-start"><div class="bg-chronos-50 p-3 rounded-lg text-chronos-600 mb-4"><i class="fa-solid fa-file-lines text-xl"></i></div><h3 class="font-bold text-lg mb-2">Document Converter</h3><p class="text-sm text-gray-500 mb-4 flex-grow">Convert between doc formats.</p><a href="#" class="text-chronos-600 font-semibold text-sm hover:underline">Use Tool &rarr;</a></div>
-                <div class="tool-card bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex flex-col items-start"><div class="bg-chronos-50 p-3 rounded-lg text-chronos-600 mb-4"><i class="fa-solid fa-lock text-xl"></i></div><h3 class="font-bold text-lg mb-2">PDF Lock/Unlock</h3><p class="text-sm text-gray-500 mb-4 flex-grow">Add or remove PDF passwords.</p><a href="#" class="text-chronos-600 font-semibold text-sm hover:underline">Use Tool &rarr;</a></div>
-                <div class="tool-card bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex flex-col items-start"><div class="bg-chronos-50 p-3 rounded-lg text-chronos-600 mb-4"><i class="fa-solid fa-signature text-xl"></i></div><h3 class="font-bold text-lg mb-2">eSign PDF</h3><p class="text-sm text-gray-500 mb-4 flex-grow">Digitally sign documents.</p><a href="#" class="text-chronos-600 font-semibold text-sm hover:underline">Use Tool &rarr;</a></div>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div class="tool-card bg-white p-5 rounded-xl shadow-sm border border-gray-100 cursor-pointer" onclick="openTool('ageCalc')"><h3 class="font-bold text-lg mb-1">Age Calculator</h3><p class="text-xs text-gray-500 mb-3">Exact age calculation.</p><span class="text-chronos-600 text-sm font-semibold">Use Tool &rarr;</span></div>
+                <div class="tool-card bg-white p-5 rounded-xl shadow-sm border border-gray-100 cursor-pointer" onclick="openTool('bmiCalc')"><h3 class="font-bold text-lg mb-1">BMI Calculator</h3><p class="text-xs text-gray-500 mb-3">Body Mass Index.</p><span class="text-chronos-600 text-sm font-semibold">Use Tool &rarr;</span></div>
+                <div class="tool-card bg-white p-5 rounded-xl shadow-sm border border-gray-100 cursor-pointer"><h3 class="font-bold text-lg mb-1">Loan EMI</h3><p class="text-xs text-gray-500 mb-3">Calculate monthly payments.</p><span class="text-chronos-600 text-sm font-semibold">Use Tool &rarr;</span></div>
+                <div class="tool-card bg-white p-5 rounded-xl shadow-sm border border-gray-100 cursor-pointer"><h3 class="font-bold text-lg mb-1">GST Calculator</h3><p class="text-xs text-gray-500 mb-3">Calculate tax.</p><span class="text-chronos-600 text-sm font-semibold">Use Tool &rarr;</span></div>
             </div>
         </section>
 
-        <!-- 4. Clock Tools -->
+        <!-- 5. TEXT TOOLS -->
         <section class="tool-category">
-            <div class="mb-6 border-l-4 border-chronos-600 pl-4">
-                <h2 class="text-2xl font-bold text-gray-800">🕜 Clock Tools</h2>
-                <p class="text-gray-500">Manage time schedules effectively.</p>
+            <div class="flex items-center gap-3 mb-6 border-b pb-2 border-gray-200">
+                <div class="bg-purple-100 text-purple-600 p-2 rounded-lg"><i class="fa-solid fa-font"></i></div>
+                <div>
+                    <h2 class="text-2xl font-bold text-gray-800">Text Tools</h2>
+                    <p class="text-sm text-gray-500">Format and analyze text.</p>
+                </div>
             </div>
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 card-grid">
-                <div class="tool-card bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex flex-col items-start"><div class="bg-chronos-50 p-3 rounded-lg text-chronos-600 mb-4"><i class="fa-solid fa-briefcase text-xl"></i></div><h3 class="font-bold text-lg mb-2">Business Schedule</h3><p class="text-sm text-gray-500 mb-4 flex-grow">Manage work and marriage timelines.</p><a href="#" class="text-chronos-600 font-semibold text-sm hover:underline">Use Tool &rarr;</a></div>
-                <div class="tool-card bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex flex-col items-start"><div class="bg-chronos-50 p-3 rounded-lg text-chronos-600 mb-4"><i class="fa-solid fa-book-open text-xl"></i></div><h3 class="font-bold text-lg mb-2">Study Schedule</h3><p class="text-sm text-gray-500 mb-4 flex-grow">Optimize study timing.</p><a href="#" class="text-chronos-600 font-semibold text-sm hover:underline">Use Tool &rarr;</a></div>
-                <div class="tool-card bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex flex-col items-start"><div class="bg-chronos-50 p-3 rounded-lg text-chronos-600 mb-4"><i class="fa-solid fa-dumbbell text-xl"></i></div><h3 class="font-bold text-lg mb-2">Gym Schedule</h3><p class="text-sm text-gray-500 mb-4 flex-grow">Track workout timings.</p><a href="#" class="text-chronos-600 font-semibold text-sm hover:underline">Use Tool &rarr;</a></div>
-                <div class="tool-card bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex flex-col items-start"><div class="bg-chronos-50 p-3 rounded-lg text-chronos-600 mb-4"><i class="fa-solid fa-person-running text-xl"></i></div><h3 class="font-bold text-lg mb-2">Sport Schedule</h3><p class="text-sm text-gray-500 mb-4 flex-grow">Manage athletic activities.</p><a href="#" class="text-chronos-600 font-semibold text-sm hover:underline">Use Tool &rarr;</a></div>
-                <div class="tool-card bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex flex-col items-start"><div class="bg-chronos-50 p-3 rounded-lg text-chronos-600 mb-4"><i class="fa-solid fa-stopwatch text-xl"></i></div><h3 class="font-bold text-lg mb-2">Clock / Alarm</h3><p class="text-sm text-gray-500 mb-4 flex-grow">Stopwatch and alarm features.</p><a href="#" class="text-chronos-600 font-semibold text-sm hover:underline">Use Tool &rarr;</a></div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div class="tool-card bg-white p-5 rounded-xl shadow-sm border border-gray-100 cursor-pointer" onclick="openTool('wordCount')"><h3 class="font-bold text-lg mb-1">Word Counter</h3><p class="text-xs text-gray-500 mb-3">Count words & chars.</p><span class="text-chronos-600 text-sm font-semibold">Use Tool &rarr;</span></div>
+                <div class="tool-card bg-white p-5 rounded-xl shadow-sm border border-gray-100 cursor-pointer" onclick="openTool('caseConv')"><h3 class="font-bold text-lg mb-1">Case Converter</h3><p class="text-xs text-gray-500 mb-3">UPPER & lowercase.</p><span class="text-chronos-600 text-sm font-semibold">Use Tool &rarr;</span></div>
+                <div class="tool-card bg-white p-5 rounded-xl shadow-sm border border-gray-100 cursor-pointer"><h3 class="font-bold text-lg mb-1">Remove Duplicates</h3><p class="text-xs text-gray-500 mb-3">Clean text lists.</p><span class="text-chronos-600 text-sm font-semibold">Use Tool &rarr;</span></div>
             </div>
         </section>
 
-        <!-- 5. Calculator Tools -->
+        <!-- 6. CLOCK & SCHEDULE -->
         <section class="tool-category">
-            <div class="mb-6 border-l-4 border-chronos-600 pl-4">
-                <h2 class="text-2xl font-bold text-gray-800">🧮 Calculator Tools</h2>
-                <p class="text-gray-500">Precise calculations for every need.</p>
+            <div class="flex items-center gap-3 mb-6 border-b pb-2 border-gray-200">
+                <div class="bg-yellow-100 text-yellow-600 p-2 rounded-lg"><i class="fa-solid fa-clock"></i></div>
+                <div>
+                    <h2 class="text-2xl font-bold text-gray-800">Time & Schedule</h2>
+                    <p class="text-sm text-gray-500">Manage your routines.</p>
+                </div>
             </div>
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 card-grid">
-                <div class="tool-card bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex flex-col items-start"><div class="bg-chronos-50 p-3 rounded-lg text-chronos-600 mb-4"><i class="fa-solid fa-flask text-xl"></i></div><h3 class="font-bold text-lg mb-2">Scientific Calculator</h3><p class="text-sm text-gray-500 mb-4 flex-grow">Advanced math functions.</p><a href="#" class="text-chronos-600 font-semibold text-sm hover:underline">Use Tool &rarr;</a></div>
-                <div class="tool-card bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex flex-col items-start"><div class="bg-chronos-50 p-3 rounded-lg text-chronos-600 mb-4"><i class="fa-solid fa-cake-candles text-xl"></i></div><h3 class="font-bold text-lg mb-2">Age Calculator</h3><p class="text-sm text-gray-500 mb-4 flex-grow">Calculate exact age.</p><a href="#" class="text-chronos-600 font-semibold text-sm hover:underline">Use Tool &rarr;</a></div>
-                <div class="tool-card bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex flex-col items-start"><div class="bg-chronos-50 p-3 rounded-lg text-chronos-600 mb-4"><i class="fa-solid fa-weight-scale text-xl"></i></div><h3 class="font-bold text-lg mb-2">BMI Calculator</h3><p class="text-sm text-gray-500 mb-4 flex-grow">Check Body Mass Index.</p><a href="#" class="text-chronos-600 font-semibold text-sm hover:underline">Use Tool &rarr;</a></div>
-                <div class="tool-card bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex flex-col items-start"><div class="bg-chronos-50 p-3 rounded-lg text-chronos-600 mb-4"><i class="fa-solid fa-house-chimney text-xl"></i></div><h3 class="font-bold text-lg mb-2">Loan EMI Calculator</h3><p class="text-sm text-gray-500 mb-4 flex-grow">Calculate loan payments.</p><a href="#" class="text-chronos-600 font-semibold text-sm hover:underline">Use Tool &rarr;</a></div>
-                <div class="tool-card bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex flex-col items-start"><div class="bg-chronos-50 p-3 rounded-lg text-chronos-600 mb-4"><i class="fa-solid fa-percent text-xl"></i></div><h3 class="font-bold text-lg mb-2">GST Calculator</h3><p class="text-sm text-gray-500 mb-4 flex-grow">Tax calculations made easy.</p><a href="#" class="text-chronos-600 font-semibold text-sm hover:underline">Use Tool &rarr;</a></div>
-                <div class="tool-card bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex flex-col items-start"><div class="bg-chronos-50 p-3 rounded-lg text-chronos-600 mb-4"><i class="fa-solid fa-coins text-xl"></i></div><h3 class="font-bold text-lg mb-2">Currency Converter</h3><p class="text-sm text-gray-500 mb-4 flex-grow">Live currency exchange rates.</p><a href="#" class="text-chronos-600 font-semibold text-sm hover:underline">Use Tool &rarr;</a></div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div class="tool-card bg-white p-5 rounded-xl shadow-sm border border-gray-100 cursor-pointer"><h3 class="font-bold text-lg mb-1">Business Schedule</h3><p class="text-xs text-gray-500 mb-3">Work timeline.</p><span class="text-chronos-600 text-sm font-semibold">Use Tool &rarr;</span></div>
+                <div class="tool-card bg-white p-5 rounded-xl shadow-sm border border-gray-100 cursor-pointer"><h3 class="font-bold text-lg mb-1">Gym Schedule</h3><p class="text-xs text-gray-500 mb-3">Workout logs.</p><span class="text-chronos-600 text-sm font-semibold">Use Tool &rarr;</span></div>
+                <div class="tool-card bg-white p-5 rounded-xl shadow-sm border border-gray-100 cursor-pointer"><h3 class="font-bold text-lg mb-1">Study Timer</h3><p class="text-xs text-gray-500 mb-3">Focus mode.</p><span class="text-chronos-600 text-sm font-semibold">Use Tool &rarr;</span></div>
             </div>
         </section>
 
-        <!-- 6. Text Tools -->
+        <!-- 7. DEV & UTILITY -->
         <section class="tool-category">
-            <div class="mb-6 border-l-4 border-chronos-600 pl-4">
-                <h2 class="text-2xl font-bold text-gray-800">🔤 Text Tools</h2>
-                <p class="text-gray-500">Manipulate and analyze text data.</p>
+            <div class="flex items-center gap-3 mb-6 border-b pb-2 border-gray-200">
+                <div class="bg-gray-100 text-gray-600 p-2 rounded-lg"><i class="fa-solid fa-code"></i></div>
+                <div>
+                    <h2 class="text-2xl font-bold text-gray-800">Dev & Utility</h2>
+                    <p class="text-sm text-gray-500">For developers and everyone.</p>
+                </div>
             </div>
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 card-grid">
-                <div class="tool-card bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex flex-col items-start"><div class="bg-chronos-50 p-3 rounded-lg text-chronos-600 mb-4"><i class="fa-solid fa-font text-xl"></i></div><h3 class="font-bold text-lg mb-2">Text Case Converter</h3><p class="text-sm text-gray-500 mb-4 flex-grow">UPPERCASE, lowercase, etc.</p><a href="#" class="text-chronos-600 font-semibold text-sm hover:underline">Use Tool &rarr;</a></div>
-                <div class="tool-card bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex flex-col items-start"><div class="bg-chronos-50 p-3 rounded-lg text-chronos-600 mb-4"><i class="fa-solid fa-list-ol text-xl"></i></div><h3 class="font-bold text-lg mb-2">Word Counter</h3><p class="text-sm text-gray-500 mb-4 flex-grow">Count words and characters.</p><a href="#" class="text-chronos-600 font-semibold text-sm hover:underline">Use Tool &rarr;</a></div>
-                <div class="tool-card bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex flex-col items-start"><div class="bg-chronos-50 p-3 rounded-lg text-chronos-600 mb-4"><i class="fa-solid fa-bars-staggered text-xl"></i></div><h3 class="font-bold text-lg mb-2">Remove Duplicates</h3><p class="text-sm text-gray-500 mb-4 flex-grow">Clean up text lines.</p><a href="#" class="text-chronos-600 font-semibold text-sm hover:underline">Use Tool &rarr;</a></div>
-                <div class="tool-card bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex flex-col items-start"><div class="bg-chronos-50 p-3 rounded-lg text-chronos-600 mb-4"><i class="fa-solid fa-arrow-down-a-z text-xl"></i></div><h3 class="font-bold text-lg mb-2">Text Sorter</h3><p class="text-sm text-gray-500 mb-4 flex-grow">Alphabetize lists.</p><a href="#" class="text-chronos-600 font-semibold text-sm hover:underline">Use Tool &rarr;</a></div>
-                <div class="tool-card bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex flex-col items-start"><div class="bg-chronos-50 p-3 rounded-lg text-chronos-600 mb-4"><i class="fa-solid fa-left-long text-xl"></i></div><h3 class="font-bold text-lg mb-2">Text Reverser</h3><p class="text-sm text-gray-500 mb-4 flex-grow">Reverse text strings.</p><a href="#" class="text-chronos-600 font-semibold text-sm hover:underline">Use Tool &rarr;</a></div>
-                <div class="tool-card bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex flex-col items-start"><div class="bg-chronos-50 p-3 rounded-lg text-chronos-600 mb-4"><i class="fa-solid fa-user-secret text-xl"></i></div><h3 class="font-bold text-lg mb-2">Text Encryptor</h3><p class="text-sm text-gray-500 mb-4 flex-grow">Secure your text data.</p><a href="#" class="text-chronos-600 font-semibold text-sm hover:underline">Use Tool &rarr;</a></div>
-            </div>
-        </section>
-
-        <!-- 7. Web/Developer Tools -->
-        <section class="tool-category">
-            <div class="mb-6 border-l-4 border-chronos-600 pl-4">
-                <h2 class="text-2xl font-bold text-gray-800">🌐 Web/Dev Tools</h2>
-                <p class="text-gray-500">Utilities for developers and designers.</p>
-            </div>
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 card-grid">
-                <div class="tool-card bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex flex-col items-start"><div class="bg-chronos-50 p-3 rounded-lg text-chronos-600 mb-4"><i class="fa-brands fa-html5 text-xl"></i></div><h3 class="font-bold text-lg mb-2">Code Minifier</h3><p class="text-sm text-gray-500 mb-4 flex-grow">Minify HTML, CSS, JS.</p><a href="#" class="text-chronos-600 font-semibold text-sm hover:underline">Use Tool &rarr;</a></div>
-                <div class="tool-card bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex flex-col items-start"><div class="bg-chronos-50 p-3 rounded-lg text-chronos-600 mb-4"><i class="fa-solid fa-code text-xl"></i></div><h3 class="font-bold text-lg mb-2">JSON Formatter</h3><p class="text-sm text-gray-500 mb-4 flex-grow">Format & validate JSON.</p><a href="#" class="text-chronos-600 font-semibold text-sm hover:underline">Use Tool &rarr;</a></div>
-                <div class="tool-card bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex flex-col items-start"><div class="bg-chronos-50 p-3 rounded-lg text-chronos-600 mb-4"><i class="fa-solid fa-binary text-xl"></i></div><h3 class="font-bold text-lg mb-2">Base64 Converter</h3><p class="text-sm text-gray-500 mb-4 flex-grow">Encode and decode data.</p><a href="#" class="text-chronos-600 font-semibold text-sm hover:underline">Use Tool &rarr;</a></div>
-                <div class="tool-card bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex flex-col items-start"><div class="bg-chronos-50 p-3 rounded-lg text-chronos-600 mb-4"><i class="fa-solid fa-link text-xl"></i></div><h3 class="font-bold text-lg mb-2">URL Encoder</h3><p class="text-sm text-gray-500 mb-4 flex-grow">Encode/Decode URLs.</p><a href="#" class="text-chronos-600 font-semibold text-sm hover:underline">Use Tool &rarr;</a></div>
-                <div class="tool-card bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex flex-col items-start"><div class="bg-chronos-50 p-3 rounded-lg text-chronos-600 mb-4"><i class="fa-solid fa-eye-dropper text-xl"></i></div><h3 class="font-bold text-lg mb-2">Color Picker</h3><p class="text-sm text-gray-500 mb-4 flex-grow">Convert color codes.</p><a href="#" class="text-chronos-600 font-semibold text-sm hover:underline">Use Tool &rarr;</a></div>
-                <div class="tool-card bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex flex-col items-start"><div class="bg-chronos-50 p-3 rounded-lg text-chronos-600 mb-4"><i class="fa-solid fa-asterisk text-xl"></i></div><h3 class="font-bold text-lg mb-2">Regex Tester</h3><p class="text-sm text-gray-500 mb-4 flex-grow">Test regular expressions.</p><a href="#" class="text-chronos-600 font-semibold text-sm hover:underline">Use Tool &rarr;</a></div>
-            </div>
-        </section>
-
-        <!-- 8. Color Tools -->
-        <section class="tool-category">
-            <div class="mb-6 border-l-4 border-chronos-600 pl-4">
-                <h2 class="text-2xl font-bold text-gray-800">🎨 Color Tools</h2>
-                <p class="text-gray-500">Palettes, gradients, and conversions.</p>
-            </div>
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 card-grid">
-                <div class="tool-card bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex flex-col items-start"><div class="bg-chronos-50 p-3 rounded-lg text-chronos-600 mb-4"><i class="fa-solid fa-palette text-xl"></i></div><h3 class="font-bold text-lg mb-2">Image Color Picker</h3><p class="text-sm text-gray-500 mb-4 flex-grow">Extract colors from image.</p><a href="#" class="text-chronos-600 font-semibold text-sm hover:underline">Use Tool &rarr;</a></div>
-                <div class="tool-card bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex flex-col items-start"><div class="bg-chronos-50 p-3 rounded-lg text-chronos-600 mb-4"><i class="fa-solid fa-hashtag text-xl"></i></div><h3 class="font-bold text-lg mb-2">HEX to RGB</h3><p class="text-sm text-gray-500 mb-4 flex-grow">Convert color formats.</p><a href="#" class="text-chronos-600 font-semibold text-sm hover:underline">Use Tool &rarr;</a></div>
-                <div class="tool-card bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex flex-col items-start"><div class="bg-chronos-50 p-3 rounded-lg text-chronos-600 mb-4"><i class="fa-solid fa-swatchbook text-xl"></i></div><h3 class="font-bold text-lg mb-2">Gradient Gen</h3><p class="text-sm text-gray-500 mb-4 flex-grow">Create CSS gradients.</p><a href="#" class="text-chronos-600 font-semibold text-sm hover:underline">Use Tool &rarr;</a></div>
-                <div class="tool-card bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex flex-col items-start"><div class="bg-chronos-50 p-3 rounded-lg text-chronos-600 mb-4"><i class="fa-solid fa-circle-half-stroke text-xl"></i></div><h3 class="font-bold text-lg mb-2">Contrast Checker</h3><p class="text-sm text-gray-500 mb-4 flex-grow">Accessibility contrast test.</p><a href="#" class="text-chronos-600 font-semibold text-sm hover:underline">Use Tool &rarr;</a></div>
-                <div class="tool-card bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex flex-col items-start"><div class="bg-chronos-50 p-3 rounded-lg text-chronos-600 mb-4"><i class="fa-solid fa-table-cells text-xl"></i></div><h3 class="font-bold text-lg mb-2">Palette Gen</h3><p class="text-sm text-gray-500 mb-4 flex-grow">Generate color schemes.</p><a href="#" class="text-chronos-600 font-semibold text-sm hover:underline">Use Tool &rarr;</a></div>
-                <div class="tool-card bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex flex-col items-start"><div class="bg-chronos-50 p-3 rounded-lg text-chronos-600 mb-4"><i class="fa-solid fa-eye text-xl"></i></div><h3 class="font-bold text-lg mb-2">Blindness Sim</h3><p class="text-sm text-gray-500 mb-4 flex-grow">Simulate color blindness.</p><a href="#" class="text-chronos-600 font-semibold text-sm hover:underline">Use Tool &rarr;</a></div>
-            </div>
-        </section>
-
-        <!-- 9. SEO & Marketing -->
-        <section class="tool-category">
-            <div class="mb-6 border-l-4 border-chronos-600 pl-4">
-                <h2 class="text-2xl font-bold text-gray-800">🌍 SEO Tools</h2>
-                <p class="text-gray-500">Optimize content for search engines.</p>
-            </div>
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 card-grid">
-                <div class="tool-card bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex flex-col items-start"><div class="bg-chronos-50 p-3 rounded-lg text-chronos-600 mb-4"><i class="fa-solid fa-magnifying-glass-chart text-xl"></i></div><h3 class="font-bold text-lg mb-2">Keyword Density</h3><p class="text-sm text-gray-500 mb-4 flex-grow">Check keyword usage.</p><a href="#" class="text-chronos-600 font-semibold text-sm hover:underline">Use Tool &rarr;</a></div>
-                <div class="tool-card bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex flex-col items-start"><div class="bg-chronos-50 p-3 rounded-lg text-chronos-600 mb-4"><i class="fa-solid fa-tags text-xl"></i></div><h3 class="font-bold text-lg mb-2">Meta Analyzer</h3><p class="text-sm text-gray-500 mb-4 flex-grow">Analyze meta tags.</p><a href="#" class="text-chronos-600 font-semibold text-sm hover:underline">Use Tool &rarr;</a></div>
-            </div>
-        </section>
-
-        <!-- 10. Utility Tools -->
-        <section class="tool-category">
-            <div class="mb-6 border-l-4 border-chronos-600 pl-4">
-                <h2 class="text-2xl font-bold text-gray-800">🛠️ Utility Tools</h2>
-                <p class="text-gray-500">Everyday handy utilities.</p>
-            </div>
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 card-grid">
-                <div class="tool-card bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex flex-col items-start"><div class="bg-chronos-50 p-3 rounded-lg text-chronos-600 mb-4"><i class="fa-solid fa-qrcode text-xl"></i></div><h3 class="font-bold text-lg mb-2">QR Generator</h3><p class="text-sm text-gray-500 mb-4 flex-grow">Create and scan QR codes.</p><a href="#" class="text-chronos-600 font-semibold text-sm hover:underline">Use Tool &rarr;</a></div>
-                <div class="tool-card bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex flex-col items-start"><div class="bg-chronos-50 p-3 rounded-lg text-chronos-600 mb-4"><i class="fa-solid fa-barcode text-xl"></i></div><h3 class="font-bold text-lg mb-2">Barcode Gen</h3><p class="text-sm text-gray-500 mb-4 flex-grow">Create product barcodes.</p><a href="#" class="text-chronos-600 font-semibold text-sm hover:underline">Use Tool &rarr;</a></div>
-                <div class="tool-card bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex flex-col items-start"><div class="bg-chronos-50 p-3 rounded-lg text-chronos-600 mb-4"><i class="fa-solid fa-fingerprint text-xl"></i></div><h3 class="font-bold text-lg mb-2">UUID Generator</h3><p class="text-sm text-gray-500 mb-4 flex-grow">Generate unique IDs.</p><a href="#" class="text-chronos-600 font-semibold text-sm hover:underline">Use Tool &rarr;</a></div>
-                <div class="tool-card bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex flex-col items-start"><div class="bg-chronos-50 p-3 rounded-lg text-chronos-600 mb-4"><i class="fa-solid fa-ruler-combined text-xl"></i></div><h3 class="font-bold text-lg mb-2">Unit Converter</h3><p class="text-sm text-gray-500 mb-4 flex-grow">Convert weight, length, etc.</p><a href="#" class="text-chronos-600 font-semibold text-sm hover:underline">Use Tool &rarr;</a></div>
-                <div class="tool-card bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex flex-col items-start"><div class="bg-chronos-50 p-3 rounded-lg text-chronos-600 mb-4"><i class="fa-solid fa-earth-americas text-xl"></i></div><h3 class="font-bold text-lg mb-2">Time Zone</h3><p class="text-sm text-gray-500 mb-4 flex-grow">Convert world times.</p><a href="#" class="text-chronos-600 font-semibold text-sm hover:underline">Use Tool &rarr;</a></div>
-                <div class="tool-card bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex flex-col items-start"><div class="bg-chronos-50 p-3 rounded-lg text-chronos-600 mb-4"><i class="fa-solid fa-key text-xl"></i></div><h3 class="font-bold text-lg mb-2">Password Gen</h3><p class="text-sm text-gray-500 mb-4 flex-grow">Create secure passwords.</p><a href="#" class="text-chronos-600 font-semibold text-sm hover:underline">Use Tool &rarr;</a></div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div class="tool-card bg-white p-5 rounded-xl shadow-sm border border-gray-100 cursor-pointer" onclick="openTool('passGen')"><h3 class="font-bold text-lg mb-1">Password Gen</h3><p class="text-xs text-gray-500 mb-3">Secure passwords.</p><span class="text-chronos-600 text-sm font-semibold">Use Tool &rarr;</span></div>
+                <div class="tool-card bg-white p-5 rounded-xl shadow-sm border border-gray-100 cursor-pointer"><h3 class="font-bold text-lg mb-1">QR Generator</h3><p class="text-xs text-gray-500 mb-3">Create QR codes.</p><span class="text-chronos-600 text-sm font-semibold">Use Tool &rarr;</span></div>
+                <div class="tool-card bg-white p-5 rounded-xl shadow-sm border border-gray-100 cursor-pointer"><h3 class="font-bold text-lg mb-1">Color Picker</h3><p class="text-xs text-gray-500 mb-3">HEX & RGB codes.</p><span class="text-chronos-600 text-sm font-semibold">Use Tool &rarr;</span></div>
+                <div class="tool-card bg-white p-5 rounded-xl shadow-sm border border-gray-100 cursor-pointer"><h3 class="font-bold text-lg mb-1">JSON Formatter</h3><p class="text-xs text-gray-500 mb-3">Beautify JSON.</p><span class="text-chronos-600 text-sm font-semibold">Use Tool &rarr;</span></div>
             </div>
         </section>
 
@@ -283,99 +214,44 @@
             <h2 class="text-3xl font-bold mb-4">Go Premium for More Power</h2>
             <p class="text-chronos-100 mb-8 max-w-xl mx-auto">Get unlimited access, remove ads, and enjoy a faster experience with Chronos Premium. Try it free for 30 days.</p>
             <div class="flex flex-col md:flex-row gap-4 justify-center">
-                <a href="#" class="bg-white text-chronos-900 font-bold py-3 px-8 rounded-full shadow-lg hover:bg-gray-100 transition">Start 30-Day Free Trial</a>
-                <a href="#" class="border-2 border-white text-white font-bold py-3 px-8 rounded-full hover:bg-white hover:text-chronos-900 transition">Buy Premium & Remove Ads</a>
+                <button class="bg-white text-chronos-900 font-bold py-3 px-8 rounded-full shadow-lg hover:bg-gray-100 transition">Start 30-Day Free Trial</button>
+                <button class="border-2 border-white text-white font-bold py-3 px-8 rounded-full hover:bg-white hover:text-chronos-900 transition">Buy Premium & Remove Ads</button>
             </div>
         </div>
     </div>
 
     <!-- FOOTER -->
     <footer class="bg-gray-900 text-white pt-16 pb-8">
-        <div class="container mx-auto px-4">
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
-                <!-- Brand -->
-                <div class="col-span-1 md:col-span-1">
-                    <a href="#" class="flex items-center gap-2 text-2xl font-bold text-white mb-4">
-                        <i class="fa-solid fa-layer-group text-chronos-500"></i>
-                        <span>Chronos</span>
-                    </a>
-                    <p class="text-gray-400 text-sm">Simplifying your digital life with a suite of powerful, everyday tools.</p>
-                </div>
-                
-                <!-- Quick Links -->
-                <div>
-                    <h4 class="text-lg font-bold mb-4">Quick Links</h4>
-                    <ul class="space-y-2 text-gray-400 text-sm">
-                        <li><a href="#" class="hover:text-white transition">Home</a></li>
-                        <li><a href="#tools-section" class="hover:text-white transition">All Tools</a></li>
-                        <li><a href="mailto:hupboys@gmail.com" class="hover:text-white transition">Contact Us</a></li>
-                    </ul>
-                </div>
-
-                <!-- Legal -->
-                <div>
-                    <h4 class="text-lg font-bold mb-4">Legal</h4>
-                    <ul class="space-y-2 text-gray-400 text-sm">
-                        <li><a href="#" class="hover:text-white transition">Privacy Policy</a></li>
-                        <li><a href="#" class="hover:text-white transition">Terms of Use</a></li>
-                        <li><a href="#" class="hover:text-white transition">Disclaimer</a></li>
-                    </ul>
-                </div>
-
-                <!-- Contact -->
-                <div>
-                    <h4 class="text-lg font-bold mb-4">Contact</h4>
-                    <p class="text-gray-400 text-sm mb-2">Need help? Email us:</p>
-                    <a href="mailto:hupboys@gmail.com" class="text-chronos-400 hover:text-white transition font-semibold">hupboys@gmail.com</a>
-                </div>
+        <div class="container mx-auto px-4 text-center">
+            <div class="flex items-center justify-center gap-2 text-2xl font-bold text-white mb-4">
+                <i class="fa-solid fa-layer-group text-chronos-500"></i>
+                <span>Chronos</span>
             </div>
-
-            <div class="border-t border-gray-800 pt-8 text-center text-gray-500 text-sm">
-                &copy; 2023 Chronos Multi Tools. All rights reserved.
+            <p class="text-gray-400 text-sm mb-6">Simplifying your digital life.</p>
+            <div class="text-xs text-gray-500">
+                <a href="#" class="mx-2 hover:text-white">Privacy</a> | 
+                <a href="#" class="mx-2 hover:text-white">Terms</a> | 
+                Email: <span class="text-white">hupboys@gmail.com</span>
+            </div>
+            <div class="border-t border-gray-800 mt-8 pt-4">
+                &copy; 2023 Chronos Multi Tools.
             </div>
         </div>
     </footer>
 
-    <!-- JavaScript for Search Logic -->
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const searchInput = document.getElementById('toolSearch');
-            const toolCards = document.querySelectorAll('.tool-card');
-            const categories = document.querySelectorAll('.tool-category');
+    <!-- MODAL POPUP (TOOL INTERFACE) -->
+    <div id="toolModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden-modal" style="opacity: 0; pointer-events: none;">
+        <div class="bg-white w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden transform scale-95 transition-all" id="modalBox">
+            <div class="p-4 bg-gray-50 border-b flex justify-between items-center">
+                <h3 id="modalTitle" class="text-lg font-bold text-gray-800">Tool Name</h3>
+                <button onclick="closeModal()" class="text-gray-500 hover:text-red-500 text-xl"><i class="fa-solid fa-times"></i></button>
+            </div>
+            <div id="modalContent" class="p-6">
+                <!-- Tool HTML Injected Here -->
+            </div>
+        </div>
+    </div>
 
-            searchInput.addEventListener('keyup', (e) => {
-                const term = e.target.value.toLowerCase();
-
-                toolCards.forEach(card => {
-                    const toolName = card.querySelector('h3').textContent.toLowerCase();
-                    const toolDesc = card.querySelector('p').textContent.toLowerCase();
-
-                    if (toolName.includes(term) || toolDesc.includes(term)) {
-                        card.style.display = 'flex'; // Restore flex display
-                    } else {
-                        card.style.display = 'none';
-                    }
-                });
-
-                // Hide empty categories
-                categories.forEach(category => {
-                    const visibleCards = category.querySelectorAll('.tool-card[style="display: flex;"]');
-                    // Check if *any* card in this category is NOT hidden (display: none)
-                    // The inline style check is specific to how we hid them above
-                    const allCards = category.querySelectorAll('.tool-card');
-                    let hasVisible = false;
-                    allCards.forEach(c => {
-                        if (c.style.display !== 'none') hasVisible = true;
-                    });
-
-                    if (hasVisible) {
-                        category.style.display = 'block';
-                    } else {
-                        category.style.display = 'none';
-                    }
-                });
-            });
-        });
-    </script>
+    <script src="script.js"></script>
 </body>
-  </html>
+            </html>
