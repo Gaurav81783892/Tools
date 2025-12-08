@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chronos Tools | Ultimate Suite</title>
+    <title>Chronos Multi Tools | Ultimate Suite</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;700&display=swap" rel="stylesheet">
     
     <script>
         tailwind.config = {
@@ -14,7 +14,7 @@
                 extend: {
                     fontFamily: { sans: ['Outfit', 'sans-serif'] },
                     colors: {
-                        brand: { 50: '#f0f9ff', 500: '#0ea5e9', 600: '#0284c7', 900: '#0c4a6e' }
+                        brand: { 50: '#f0f9ff', 100: '#e0f2fe', 500: '#0ea5e9', 600: '#0284c7', 900: '#0c4a6e' }
                     }
                 }
             }
@@ -22,18 +22,29 @@
     </script>
     <style>
         body { background-color: #f8fafc; }
-        .tool-card { transition: all 0.3s; background: white; border: 1px solid #e2e8f0; }
-        .tool-card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(14, 165, 233, 0.15); border-color: #0ea5e9; }
+        /* Smooth Scroll */
+        html { scroll-behavior: smooth; }
         
-        /* Sidebar & Modal Animations */
-        #sidebar { transition: transform 0.3s ease-in-out; }
-        .sidebar-closed { transform: translateX(100%); }
-        .sidebar-open { transform: translateX(0); }
-        .modal { transition: opacity 0.2s, visibility 0.2s; opacity: 0; visibility: hidden; }
+        /* Card Effects */
+        .tool-card { 
+            background: white; 
+            border: 1px solid #e2e8f0; 
+            transition: all 0.2s ease-in-out; 
+            position: relative;
+            overflow: hidden;
+        }
+        .tool-card:hover { 
+            transform: translateY(-4px); 
+            box-shadow: 0 12px 24px -10px rgba(14, 165, 233, 0.2); 
+            border-color: #0ea5e9; 
+        }
+        
+        /* Modal & Sidebar */
+        .modal { opacity: 0; visibility: hidden; transition: all 0.2s; }
         .modal.active { opacity: 1; visibility: visible; }
-        
-        /* Premium Glow */
-        .premium-border { border: 2px solid #eab308; box-shadow: 0 0 10px rgba(234, 179, 8, 0.3); }
+        #sidebar { transition: transform 0.3s; }
+        .sidebar-open { transform: translateX(0); }
+        .sidebar-closed { transform: translateX(100%); }
     </style>
 </head>
 <body class="text-slate-800">
@@ -42,142 +53,214 @@
     <header class="sticky top-0 z-40 bg-white/90 backdrop-blur border-b border-slate-200">
         <div class="container mx-auto px-4 py-3 flex justify-between items-center">
             <a href="#" class="flex items-center gap-2 text-2xl font-bold text-brand-900">
-                <div class="w-10 h-10 bg-brand-600 rounded-xl flex items-center justify-center text-white"><i class="fa-solid fa-layer-group"></i></div>
+                <div class="w-10 h-10 bg-gradient-to-tr from-brand-500 to-blue-600 rounded-lg flex items-center justify-center text-white shadow-lg">
+                    <i class="fa-solid fa-layer-group"></i>
+                </div>
                 <span>Chronos</span>
             </a>
             
             <div class="hidden md:flex items-center gap-6">
-                <button onclick="openPremiumModal()" class="text-yellow-600 font-bold hover:text-yellow-700"><i class="fa-solid fa-crown"></i> Go Premium</button>
-                <div id="desktopAuth"></div>
+                <button onclick="openPremiumModal()" class="text-yellow-600 font-bold hover:text-yellow-700 flex items-center gap-2">
+                    <i class="fa-solid fa-crown"></i> Premium
+                </button>
+                <div id="desktopAuth">
+                    <button onclick="openLoginModal()" class="bg-brand-600 text-white px-5 py-2 rounded-full font-bold shadow hover:bg-brand-700">Login</button>
+                </div>
             </div>
 
-            <!-- Hamburger Menu Button -->
             <button onclick="toggleSidebar()" class="md:hidden text-2xl text-slate-700"><i class="fa-solid fa-bars"></i></button>
         </div>
     </header>
 
     <!-- MOBILE SIDEBAR -->
     <div id="sidebarOverlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black/50 z-40 hidden"></div>
-    <div id="sidebar" class="fixed top-0 right-0 h-full w-72 bg-white z-50 shadow-2xl sidebar-closed flex flex-col">
-        <div class="p-5 border-b flex justify-between items-center bg-gray-50">
-            <h2 class="font-bold text-lg">Menu</h2>
+    <div id="sidebar" class="fixed top-0 right-0 h-full w-72 bg-white z-50 shadow-2xl sidebar-closed flex flex-col p-5">
+        <div class="flex justify-between items-center mb-6 border-b pb-4">
+            <h2 class="font-bold text-xl text-brand-900">Menu</h2>
             <button onclick="toggleSidebar()" class="text-red-500 text-xl"><i class="fa-solid fa-times"></i></button>
         </div>
-        <div class="p-5 flex-1 overflow-y-auto space-y-4">
-            <div id="mobileAuth" class="mb-4"></div>
-            <a href="#" onclick="openPremiumModal()" class="flex items-center gap-3 text-yellow-600 font-bold p-2 bg-yellow-50 rounded-lg"><i class="fa-solid fa-crown"></i> Upgrade Plan</a>
-            <a href="mailto:hupboys@gmail.com" class="flex items-center gap-3 text-slate-600 p-2"><i class="fa-solid fa-envelope"></i> Support</a>
+        <div class="flex-1 space-y-4">
+            <div id="mobileAuth"></div>
+            <a href="#" onclick="openPremiumModal()" class="block p-3 bg-yellow-50 text-yellow-700 rounded-lg font-bold"><i class="fa-solid fa-crown mr-2"></i> Go Premium</a>
+            <a href="mailto:hupboys@gmail.com" class="block p-3 text-slate-600 hover:bg-slate-50 rounded-lg"><i class="fa-solid fa-envelope mr-2"></i> Contact Support</a>
         </div>
     </div>
 
-    <!-- 📢 AD SPACE 1 (TOP) -->
-    <div class="container mx-auto px-4 mt-4">
-        <div class="w-full h-20 bg-gray-100 border border-dashed border-gray-300 rounded-lg flex items-center justify-center text-gray-400 text-sm">
-            <!-- PASTE GOOGLE ADS CODE HERE -->
+    <!-- HERO SECTION -->
+    <div class="bg-gradient-to-b from-brand-50 to-white pt-12 pb-8 px-4 text-center">
+        <h1 class="text-4xl md:text-5xl font-bold text-slate-900 mb-3">Your Digital <span class="text-brand-600">Powerhouse</span></h1>
+        <p class="text-slate-500 mb-8 text-lg">Convert, Calculate, Manage - All in one place.</p>
+        
+        <div class="max-w-xl mx-auto relative group">
+            <i class="fa-solid fa-search absolute left-4 top-4 text-gray-400 group-focus-within:text-brand-500 transition"></i>
+            <input type="text" id="toolSearch" placeholder="Search for PDF, Image, Age Calculator..." 
+                   class="w-full pl-12 pr-4 py-3.5 rounded-full border-2 border-slate-200 focus:border-brand-500 outline-none shadow-sm transition text-lg">
+        </div>
+    </div>
+
+    <!-- ADS SPACE 1 -->
+    <div class="container mx-auto px-4 my-6">
+        <div id="adSpaceTop" class="w-full h-24 bg-gray-100 border border-dashed border-gray-300 rounded-xl flex items-center justify-center text-gray-400 text-sm font-mono">
             GOOGLE ADS BANNER
         </div>
     </div>
 
-    <!-- SEARCH -->
-    <section class="py-8 text-center px-4">
-        <h1 class="text-3xl md:text-4xl font-bold text-slate-900 mb-2">Master Your <span class="text-brand-600">Digital Life</span></h1>
-        <div class="max-w-md mx-auto relative mt-6">
-            <i class="fa-solid fa-search absolute left-4 top-3.5 text-gray-400"></i>
-            <input type="text" id="toolSearch" placeholder="Search tools..." class="w-full pl-10 p-3 rounded-full border border-gray-300 focus:border-brand-500 outline-none">
-        </div>
-    </section>
-
-    <!-- MAIN TOOLS GRID -->
+    <!-- TOOLS CONTAINER -->
     <main class="container mx-auto px-4 pb-24 space-y-12" id="toolsContainer">
 
-        <!-- 1. CLOCK & SCHEDULE (Detailed System) -->
-        <section class="tool-category">
-            <h2 class="text-xl font-bold mb-4 flex items-center gap-2"><i class="fa-regular fa-clock text-blue-500"></i> Time Management</h2>
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                <div class="tool-card p-5 rounded-xl cursor-pointer" onclick="openTool('clockTool')">
-                    <div class="bg-blue-50 w-10 h-10 rounded-lg flex items-center justify-center text-blue-600 mb-2"><i class="fa-solid fa-earth-americas"></i></div>
-                    <h3 class="font-bold">World Clock & Alarm</h3><p class="text-xs text-gray-500">Live time & alerts.</p>
-                </div>
-                <div class="tool-card p-5 rounded-xl cursor-pointer" onclick="openTool('stopWatch')">
-                    <div class="bg-blue-50 w-10 h-10 rounded-lg flex items-center justify-center text-blue-600 mb-2"><i class="fa-solid fa-stopwatch"></i></div>
-                    <h3 class="font-bold">Stopwatch</h3><p class="text-xs text-gray-500">Lap timer.</p>
-                </div>
-                <div class="tool-card p-5 rounded-xl cursor-pointer" onclick="openTool('bizSched')">
-                    <div class="bg-blue-50 w-10 h-10 rounded-lg flex items-center justify-center text-blue-600 mb-2"><i class="fa-solid fa-briefcase"></i></div>
-                    <h3 class="font-bold">Business Schedule</h3><p class="text-xs text-gray-500">Meeting planner.</p>
-                </div>
-                <div class="tool-card p-5 rounded-xl cursor-pointer" onclick="openTool('gymSched')">
-                    <div class="bg-blue-50 w-10 h-10 rounded-lg flex items-center justify-center text-blue-600 mb-2"><i class="fa-solid fa-dumbbell"></i></div>
-                    <h3 class="font-bold">Gym Schedule</h3><p class="text-xs text-gray-500">Workout logs.</p>
-                </div>
-                <div class="tool-card p-5 rounded-xl cursor-pointer" onclick="openTool('studySched')">
-                    <div class="bg-blue-50 w-10 h-10 rounded-lg flex items-center justify-center text-blue-600 mb-2"><i class="fa-solid fa-graduation-cap"></i></div>
-                    <h3 class="font-bold">Study Focus</h3><p class="text-xs text-gray-500">Pomodoro timer.</p>
-                </div>
+        <!-- 1. IMAGE TOOLS -->
+        <section class="tool-section">
+            <div class="flex items-center gap-3 mb-5">
+                <div class="p-2 bg-blue-100 text-blue-600 rounded-lg"><i class="fa-solid fa-image"></i></div>
+                <h2 class="text-2xl font-bold text-slate-800">Image Tools</h2>
+            </div>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="tool-card p-4 rounded-xl cursor-pointer" onclick="openTool('imgConvert')"><i class="fa-solid fa-arrows-rotate text-2xl text-blue-500 mb-2"></i><h3 class="font-bold">Image Converter</h3></div>
+                <div class="tool-card p-4 rounded-xl cursor-pointer" onclick="openTool('imgCompress')"><i class="fa-solid fa-compress text-2xl text-blue-500 mb-2"></i><h3 class="font-bold">Compress Image</h3></div>
+                <div class="tool-card p-4 rounded-xl cursor-pointer" onclick="openTool('imgResize')"><i class="fa-solid fa-expand text-2xl text-blue-500 mb-2"></i><h3 class="font-bold">Resizer</h3></div>
+                <div class="tool-card p-4 rounded-xl cursor-pointer" onclick="openTool('imgCrop')"><i class="fa-solid fa-crop text-2xl text-blue-500 mb-2"></i><h3 class="font-bold">Cropper</h3></div>
+                <div class="tool-card p-4 rounded-xl cursor-pointer" onclick="openTool('bgRemove')"><i class="fa-solid fa-eraser text-2xl text-blue-500 mb-2"></i><h3 class="font-bold">Remove BG</h3></div>
+                <div class="tool-card p-4 rounded-xl cursor-pointer" onclick="openTool('imgText')"><i class="fa-solid fa-font text-2xl text-blue-500 mb-2"></i><h3 class="font-bold">Image to Text</h3></div>
+                <div class="tool-card p-4 rounded-xl cursor-pointer" onclick="openTool('imgFilter')"><i class="fa-solid fa-wand-magic-sparkles text-2xl text-blue-500 mb-2"></i><h3 class="font-bold">Filters</h3></div>
+                <div class="tool-card p-4 rounded-xl cursor-pointer" onclick="openTool('imgRotate')"><i class="fa-solid fa-rotate-right text-2xl text-blue-500 mb-2"></i><h3 class="font-bold">Rotate</h3></div>
             </div>
         </section>
 
-        <!-- 📢 AD SPACE 2 (MIDDLE) -->
-        <div class="w-full h-20 bg-gray-100 border border-dashed border-gray-300 rounded-lg flex items-center justify-center text-gray-400 text-sm">
-            GOOGLE ADS BANNER 2
-        </div>
+        <!-- 2. AUDIO & VIDEO -->
+        <section class="tool-section">
+            <div class="flex items-center gap-3 mb-5">
+                <div class="p-2 bg-red-100 text-red-600 rounded-lg"><i class="fa-solid fa-video"></i></div>
+                <h2 class="text-2xl font-bold text-slate-800">Audio/Video</h2>
+            </div>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="tool-card p-4 rounded-xl cursor-pointer" onclick="openTool('vidCompress')"><i class="fa-solid fa-file-video text-2xl text-red-500 mb-2"></i><h3 class="font-bold">Video Compress</h3></div>
+                <div class="tool-card p-4 rounded-xl cursor-pointer" onclick="openTool('audCompress')"><i class="fa-solid fa-file-audio text-2xl text-red-500 mb-2"></i><h3 class="font-bold">Audio Compress</h3></div>
+                <div class="tool-card p-4 rounded-xl cursor-pointer" onclick="openTool('audClean')"><i class="fa-solid fa-volume-xmark text-2xl text-red-500 mb-2"></i><h3 class="font-bold">Noise Remover</h3></div>
+                <div class="tool-card p-4 rounded-xl cursor-pointer" onclick="openTool('vidConvert')"><i class="fa-solid fa-shuffle text-2xl text-red-500 mb-2"></i><h3 class="font-bold">Video Converter</h3></div>
+            </div>
+        </section>
 
-        <!-- 2. UTILITY TOOLS -->
-        <section class="tool-category">
-            <h2 class="text-xl font-bold mb-4 flex items-center gap-2"><i class="fa-solid fa-wrench text-orange-500"></i> Utilities</h2>
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                <div class="tool-card p-5 rounded-xl cursor-pointer" onclick="openTool('qrGen')"><div class="bg-orange-50 w-10 h-10 rounded-lg flex items-center justify-center text-orange-600 mb-2"><i class="fa-solid fa-qrcode"></i></div><h3 class="font-bold">QR Generator</h3></div>
-                <div class="tool-card p-5 rounded-xl cursor-pointer" onclick="openTool('passGen')"><div class="bg-orange-50 w-10 h-10 rounded-lg flex items-center justify-center text-orange-600 mb-2"><i class="fa-solid fa-key"></i></div><h3 class="font-bold">Password Gen</h3></div>
-                <div class="tool-card p-5 rounded-xl cursor-pointer" onclick="openTool('imgConvert')"><div class="bg-orange-50 w-10 h-10 rounded-lg flex items-center justify-center text-orange-600 mb-2"><i class="fa-solid fa-image"></i></div><h3 class="font-bold">Image Converter</h3></div>
-                <div class="tool-card p-5 rounded-xl cursor-pointer" onclick="openTool('bmiCalc')"><div class="bg-orange-50 w-10 h-10 rounded-lg flex items-center justify-center text-orange-600 mb-2"><i class="fa-solid fa-weight-scale"></i></div><h3 class="font-bold">BMI Calculator</h3></div>
-                <div class="tool-card p-5 rounded-xl cursor-pointer" onclick="openTool('ageCalc')"><div class="bg-orange-50 w-10 h-10 rounded-lg flex items-center justify-center text-orange-600 mb-2"><i class="fa-solid fa-cake-candles"></i></div><h3 class="font-bold">Age Calculator</h3></div>
+        <!-- 3. PDF & DOCS -->
+        <section class="tool-section">
+            <div class="flex items-center gap-3 mb-5">
+                <div class="p-2 bg-orange-100 text-orange-600 rounded-lg"><i class="fa-solid fa-file-pdf"></i></div>
+                <h2 class="text-2xl font-bold text-slate-800">PDF Tools</h2>
+            </div>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="tool-card p-4 rounded-xl cursor-pointer" onclick="openTool('pdfToWord')"><i class="fa-solid fa-file-word text-2xl text-orange-500 mb-2"></i><h3 class="font-bold">PDF to Word</h3></div>
+                <div class="tool-card p-4 rounded-xl cursor-pointer" onclick="openTool('wordToPdf')"><i class="fa-solid fa-file-pdf text-2xl text-orange-500 mb-2"></i><h3 class="font-bold">Word to PDF</h3></div>
+                <div class="tool-card p-4 rounded-xl cursor-pointer" onclick="openTool('pdfMerge')"><i class="fa-solid fa-copy text-2xl text-orange-500 mb-2"></i><h3 class="font-bold">Merge PDF</h3></div>
+                <div class="tool-card p-4 rounded-xl cursor-pointer" onclick="openTool('pdfSplit')"><i class="fa-solid fa-scissors text-2xl text-orange-500 mb-2"></i><h3 class="font-bold">Split PDF</h3></div>
+                <div class="tool-card p-4 rounded-xl cursor-pointer" onclick="openTool('pdfLock')"><i class="fa-solid fa-lock text-2xl text-orange-500 mb-2"></i><h3 class="font-bold">Lock PDF</h3></div>
+                <div class="tool-card p-4 rounded-xl cursor-pointer" onclick="openTool('pdfUnlock')"><i class="fa-solid fa-unlock text-2xl text-orange-500 mb-2"></i><h3 class="font-bold">Unlock PDF</h3></div>
+                <div class="tool-card p-4 rounded-xl cursor-pointer" onclick="openTool('pdfSign')"><i class="fa-solid fa-signature text-2xl text-orange-500 mb-2"></i><h3 class="font-bold">eSign PDF</h3></div>
+                <div class="tool-card p-4 rounded-xl cursor-pointer" onclick="openTool('pdfCompress')"><i class="fa-solid fa-file-zipper text-2xl text-orange-500 mb-2"></i><h3 class="font-bold">Compress PDF</h3></div>
+            </div>
+        </section>
+
+        <!-- 4. CLOCK & SCHEDULE -->
+        <section class="tool-section">
+            <div class="flex items-center gap-3 mb-5">
+                <div class="p-2 bg-yellow-100 text-yellow-600 rounded-lg"><i class="fa-solid fa-clock"></i></div>
+                <h2 class="text-2xl font-bold text-slate-800">Time & Schedule</h2>
+            </div>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="tool-card p-4 rounded-xl cursor-pointer" onclick="openTool('bizSched')"><i class="fa-solid fa-briefcase text-2xl text-yellow-600 mb-2"></i><h3 class="font-bold">Business</h3></div>
+                <div class="tool-card p-4 rounded-xl cursor-pointer" onclick="openTool('gymSched')"><i class="fa-solid fa-dumbbell text-2xl text-yellow-600 mb-2"></i><h3 class="font-bold">Gym Schedule</h3></div>
+                <div class="tool-card p-4 rounded-xl cursor-pointer" onclick="openTool('studySched')"><i class="fa-solid fa-book text-2xl text-yellow-600 mb-2"></i><h3 class="font-bold">Study Timer</h3></div>
+                <div class="tool-card p-4 rounded-xl cursor-pointer" onclick="openTool('clockTool')"><i class="fa-solid fa-bell text-2xl text-yellow-600 mb-2"></i><h3 class="font-bold">Clock/Alarm</h3></div>
+            </div>
+        </section>
+
+        <!-- 5. CALCULATORS -->
+        <section class="tool-section">
+            <div class="flex items-center gap-3 mb-5">
+                <div class="p-2 bg-green-100 text-green-600 rounded-lg"><i class="fa-solid fa-calculator"></i></div>
+                <h2 class="text-2xl font-bold text-slate-800">Calculators</h2>
+            </div>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="tool-card p-4 rounded-xl cursor-pointer" onclick="openTool('ageCalc')"><i class="fa-solid fa-cake-candles text-2xl text-green-600 mb-2"></i><h3 class="font-bold">Age Calc</h3></div>
+                <div class="tool-card p-4 rounded-xl cursor-pointer" onclick="openTool('bmiCalc')"><i class="fa-solid fa-weight-scale text-2xl text-green-600 mb-2"></i><h3 class="font-bold">BMI Calc</h3></div>
+                <div class="tool-card p-4 rounded-xl cursor-pointer" onclick="openTool('gstCalc')"><i class="fa-solid fa-percent text-2xl text-green-600 mb-2"></i><h3 class="font-bold">GST Calc</h3></div>
+                <div class="tool-card p-4 rounded-xl cursor-pointer" onclick="openTool('loanCalc')"><i class="fa-solid fa-money-bill text-2xl text-green-600 mb-2"></i><h3 class="font-bold">Loan EMI</h3></div>
+                <div class="tool-card p-4 rounded-xl cursor-pointer" onclick="openTool('sciCalc')"><i class="fa-solid fa-flask text-2xl text-green-600 mb-2"></i><h3 class="font-bold">Scientific</h3></div>
+                <div class="tool-card p-4 rounded-xl cursor-pointer" onclick="openTool('currConv')"><i class="fa-solid fa-coins text-2xl text-green-600 mb-2"></i><h3 class="font-bold">Currency</h3></div>
+            </div>
+        </section>
+
+        <!-- 6. TEXT & DEV -->
+        <section class="tool-section">
+            <div class="flex items-center gap-3 mb-5">
+                <div class="p-2 bg-purple-100 text-purple-600 rounded-lg"><i class="fa-solid fa-code"></i></div>
+                <h2 class="text-2xl font-bold text-slate-800">Text & Dev</h2>
+            </div>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="tool-card p-4 rounded-xl cursor-pointer" onclick="openTool('wordCount')"><i class="fa-solid fa-paragraph text-2xl text-purple-600 mb-2"></i><h3 class="font-bold">Word Counter</h3></div>
+                <div class="tool-card p-4 rounded-xl cursor-pointer" onclick="openTool('caseConv')"><i class="fa-solid fa-text-height text-2xl text-purple-600 mb-2"></i><h3 class="font-bold">Case Conv.</h3></div>
+                <div class="tool-card p-4 rounded-xl cursor-pointer" onclick="openTool('dupRemove')"><i class="fa-solid fa-list text-2xl text-purple-600 mb-2"></i><h3 class="font-bold">Dedup Lines</h3></div>
+                <div class="tool-card p-4 rounded-xl cursor-pointer" onclick="openTool('passGen')"><i class="fa-solid fa-key text-2xl text-purple-600 mb-2"></i><h3 class="font-bold">Password Gen</h3></div>
+                <div class="tool-card p-4 rounded-xl cursor-pointer" onclick="openTool('qrGen')"><i class="fa-solid fa-qrcode text-2xl text-purple-600 mb-2"></i><h3 class="font-bold">QR Gen</h3></div>
+                <div class="tool-card p-4 rounded-xl cursor-pointer" onclick="openTool('jsonFmt')"><i class="fa-solid fa-code text-2xl text-purple-600 mb-2"></i><h3 class="font-bold">JSON Fmt</h3></div>
+                <div class="tool-card p-4 rounded-xl cursor-pointer" onclick="openTool('colorPick')"><i class="fa-solid fa-eye-dropper text-2xl text-purple-600 mb-2"></i><h3 class="font-bold">Color Picker</h3></div>
             </div>
         </section>
 
     </main>
 
-    <!-- MODALS -->
-    
-    <!-- Tool Modal -->
+    <!-- FOOTER -->
+    <footer class="bg-slate-900 text-white py-12 mt-12">
+        <div class="container mx-auto px-4 text-center">
+            <div class="flex items-center justify-center gap-2 text-2xl font-bold mb-4">
+                <i class="fa-solid fa-layer-group text-brand-500"></i> Chronos
+            </div>
+            <p class="text-slate-400 text-sm mb-6">Simplify your digital life.</p>
+            <div class="text-xs text-slate-500">
+                <a href="#" class="mx-2 hover:text-white">Privacy Policy</a> | 
+                <a href="#" class="mx-2 hover:text-white">Terms of Use</a> | 
+                Contact: hupboys@gmail.com
+            </div>
+        </div>
+    </footer>
+
+    <!-- MODAL POPUP -->
     <div id="toolModal" class="modal fixed inset-0 z-50 flex items-center justify-center p-4">
-        <div class="absolute inset-0 bg-black/70 backdrop-blur-sm" onclick="closeTool()"></div>
+        <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" onclick="closeTool()"></div>
         <div class="bg-white w-full max-w-lg rounded-2xl shadow-2xl relative z-10 flex flex-col max-h-[90vh]">
             <div class="p-4 border-b flex justify-between items-center bg-gray-50">
-                <h3 id="modalTitle" class="text-lg font-bold">Tool</h3>
+                <h3 id="modalTitle" class="text-lg font-bold text-slate-800">Tool</h3>
                 <button onclick="closeTool()" class="text-gray-500 hover:text-red-500"><i class="fa-solid fa-times text-xl"></i></button>
             </div>
             <div id="modalContent" class="p-6 overflow-y-auto"></div>
         </div>
     </div>
 
-    <!-- Login Modal -->
+    <!-- LOGIN MODAL -->
     <div id="loginModal" class="modal fixed inset-0 z-50 flex items-center justify-center p-4">
-        <div class="absolute inset-0 bg-black/80" onclick="closeLogin()"></div>
+        <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" onclick="closeLogin()"></div>
         <div class="bg-white w-full max-w-sm rounded-2xl shadow-2xl relative z-10 p-6 text-center">
             <h2 class="text-2xl font-bold mb-4">Login</h2>
-            <input type="text" id="usernameInput" placeholder="Enter your Name" class="w-full p-3 border rounded-lg mb-4 bg-gray-50">
-            <button onclick="performLogin()" class="w-full bg-brand-600 text-white font-bold py-3 rounded-lg">Start Using</button>
+            <input type="text" id="usernameInput" placeholder="Enter Your Name" class="w-full p-3 border rounded-lg mb-4 bg-gray-50 outline-none focus:border-brand-500">
+            <button onclick="performLogin()" class="w-full bg-brand-600 text-white font-bold py-3 rounded-lg hover:bg-brand-700 transition">Start Using</button>
         </div>
     </div>
 
-    <!-- Premium Modal (Payment) -->
+    <!-- PREMIUM MODAL -->
     <div id="premiumModal" class="modal fixed inset-0 z-50 flex items-center justify-center p-4">
-        <div class="absolute inset-0 bg-black/90 backdrop-blur-sm" onclick="closePremium()"></div>
+        <div class="absolute inset-0 bg-black/90 backdrop-blur-md" onclick="closePremium()"></div>
         <div class="bg-gradient-to-br from-slate-900 to-slate-800 text-white w-full max-w-md rounded-2xl shadow-2xl relative z-10 p-8 text-center border border-yellow-500/50">
-            <i class="fa-solid fa-crown text-4xl text-yellow-400 mb-4"></i>
+            <i class="fa-solid fa-crown text-4xl text-yellow-400 mb-4 animate-bounce"></i>
             <h2 class="text-2xl font-bold mb-2">Upgrade to Premium</h2>
-            <p class="text-gray-400 mb-6 text-sm">Remove Ads • Cloud Sync • Priority Support</p>
+            <p class="text-gray-400 mb-6 text-sm">Remove Ads • Unlimited Usage</p>
             
             <div class="bg-white/10 p-4 rounded-xl mb-6">
                 <p class="text-sm font-mono text-yellow-300 mb-2">LIFETIME ACCESS</p>
-                <p class="text-3xl font-bold">₹199 <span class="text-sm text-gray-400 font-normal">/ one-time</span></p>
+                <p class="text-3xl font-bold">₹199</p>
             </div>
 
-            <!-- PAYMENT BUTTON (UPI) -->
-            <!-- Replace 'yourupi@bank' with YOUR ACTUAL UPI ID -->
-            <a href="upi://pay?pa=gaurav@upi&pn=ChronosTools&am=199&cu=INR" 
+            <!-- PAYMENT LINK (UPI) -->
+            <a href="upi://pay?pa=YOUR_UPI_ID@okaxis&pn=ChronosPremium&am=199&cu=INR" 
                class="block w-full bg-yellow-500 text-black font-bold py-3 rounded-xl mb-3 hover:bg-yellow-400 transition">
-               Pay via UPI App
+               Pay ₹199 via UPI
             </a>
             
             <button onclick="verifyPayment()" class="text-xs text-gray-400 underline hover:text-white">
@@ -188,4 +271,4 @@
 
     <script src="script.js"></script>
 </body>
-                </html>
+            </html>
