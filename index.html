@@ -3,255 +3,189 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chronos Multi Tools - Simplify Your Digital Life</title>
-    <!-- Tailwind CSS for Modern Styling -->
+    <title>Chronos Tools | Ultimate Suite</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
     
     <script>
         tailwind.config = {
             theme: {
                 extend: {
+                    fontFamily: { sans: ['Outfit', 'sans-serif'] },
                     colors: {
-                        chronos: {
-                            50: '#eff6ff',
-                            100: '#dbeafe',
-                            500: '#3b82f6',
-                            600: '#2563eb', // Brand Color
-                            700: '#1d4ed8',
-                            900: '#1e3a8a',
-                        }
+                        brand: { 50: '#f0f9ff', 500: '#0ea5e9', 600: '#0284c7', 900: '#0c4a6e' }
                     }
                 }
             }
         }
     </script>
     <style>
-        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
-        .tool-card { transition: all 0.3s ease; }
-        .tool-card:hover { transform: translateY(-5px); box-shadow: 0 10px 25px -5px rgba(37, 99, 235, 0.15); border-color: #2563eb; }
-        .smooth-scroll { scroll-behavior: smooth; }
+        body { background-color: #f8fafc; }
+        .tool-card { transition: all 0.3s; background: white; border: 1px solid #e2e8f0; }
+        .tool-card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(14, 165, 233, 0.15); border-color: #0ea5e9; }
         
-        /* Modal Animation */
-        #toolModal { transition: opacity 0.2s ease-in-out; }
-        .hidden-modal { opacity: 0; pointer-events: none; }
-        .show-modal { opacity: 1; pointer-events: auto; }
+        /* Sidebar & Modal Animations */
+        #sidebar { transition: transform 0.3s ease-in-out; }
+        .sidebar-closed { transform: translateX(100%); }
+        .sidebar-open { transform: translateX(0); }
+        .modal { transition: opacity 0.2s, visibility 0.2s; opacity: 0; visibility: hidden; }
+        .modal.active { opacity: 1; visibility: visible; }
+        
+        /* Premium Glow */
+        .premium-border { border: 2px solid #eab308; box-shadow: 0 0 10px rgba(234, 179, 8, 0.3); }
     </style>
 </head>
-<body class="text-slate-800 smooth-scroll">
+<body class="text-slate-800">
 
-    <!-- TOP HEADER -->
-    <header class="bg-white shadow-sm sticky top-0 z-40 border-b border-gray-100">
-        <div class="container mx-auto px-4 py-4 flex justify-between items-center">
-            <!-- Logo -->
-            <a href="#" class="flex items-center gap-2 text-2xl font-bold text-chronos-700">
-                <i class="fa-solid fa-layer-group"></i>
-                <span>Chronos Tools</span>
+    <!-- HEADER -->
+    <header class="sticky top-0 z-40 bg-white/90 backdrop-blur border-b border-slate-200">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <a href="#" class="flex items-center gap-2 text-2xl font-bold text-brand-900">
+                <div class="w-10 h-10 bg-brand-600 rounded-xl flex items-center justify-center text-white"><i class="fa-solid fa-layer-group"></i></div>
+                <span>Chronos</span>
             </a>
-
-            <!-- Navigation -->
-            <nav class="hidden md:flex gap-8 font-medium text-slate-600">
-                <a href="#" class="hover:text-chronos-600 transition">Home</a>
-                <a href="#tools-section" class="hover:text-chronos-600 transition">Tools</a>
-                <a href="mailto:hupboys@gmail.com" class="hover:text-chronos-600 transition">Contact</a>
-            </nav>
             
-            <!-- Mobile Menu Icon -->
-            <button class="md:hidden text-slate-600 text-2xl"><i class="fa-solid fa-bars"></i></button>
+            <div class="hidden md:flex items-center gap-6">
+                <button onclick="openPremiumModal()" class="text-yellow-600 font-bold hover:text-yellow-700"><i class="fa-solid fa-crown"></i> Go Premium</button>
+                <div id="desktopAuth"></div>
+            </div>
+
+            <!-- Hamburger Menu Button -->
+            <button onclick="toggleSidebar()" class="md:hidden text-2xl text-slate-700"><i class="fa-solid fa-bars"></i></button>
         </div>
     </header>
 
-    <!-- HERO SECTION -->
-    <section class="bg-gradient-to-br from-chronos-900 to-chronos-600 text-white py-20 text-center relative overflow-hidden">
-        <div class="container mx-auto px-4 relative z-10">
-            <h1 class="text-4xl md:text-5xl font-bold mb-4 leading-tight">Your Daily Tools, All in One Place</h1>
-            <p class="text-lg md:text-xl text-chronos-100 mb-8 max-w-2xl mx-auto">Convert, calculate, compress, and simplify your everyday tasks — fast and free.</p>
-            <a href="#tools-section" class="inline-block bg-white text-chronos-700 font-bold py-3 px-8 rounded-full shadow-lg hover:bg-gray-100 transition transform hover:scale-105">
-                Explore Tools
-            </a>
+    <!-- MOBILE SIDEBAR -->
+    <div id="sidebarOverlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black/50 z-40 hidden"></div>
+    <div id="sidebar" class="fixed top-0 right-0 h-full w-72 bg-white z-50 shadow-2xl sidebar-closed flex flex-col">
+        <div class="p-5 border-b flex justify-between items-center bg-gray-50">
+            <h2 class="font-bold text-lg">Menu</h2>
+            <button onclick="toggleSidebar()" class="text-red-500 text-xl"><i class="fa-solid fa-times"></i></button>
         </div>
-    </section>
-
-    <!-- SEARCH BAR -->
-    <div class="container mx-auto px-4 -mt-8 relative z-20">
-        <div class="bg-white p-2 rounded-2xl shadow-xl max-w-2xl mx-auto flex items-center border border-gray-100">
-            <div class="p-3 text-gray-400"><i class="fa-solid fa-magnifying-glass text-xl"></i></div>
-            <input type="text" id="toolSearch" placeholder="Search for tools (e.g. PDF, Image, Calculator)..." 
-                   class="w-full p-3 outline-none text-gray-700 text-lg placeholder-gray-400 rounded-xl">
+        <div class="p-5 flex-1 overflow-y-auto space-y-4">
+            <div id="mobileAuth" class="mb-4"></div>
+            <a href="#" onclick="openPremiumModal()" class="flex items-center gap-3 text-yellow-600 font-bold p-2 bg-yellow-50 rounded-lg"><i class="fa-solid fa-crown"></i> Upgrade Plan</a>
+            <a href="mailto:hupboys@gmail.com" class="flex items-center gap-3 text-slate-600 p-2"><i class="fa-solid fa-envelope"></i> Support</a>
         </div>
     </div>
 
-    <!-- MAIN TOOLS CONTAINER -->
-    <main id="tools-section" class="container mx-auto px-4 py-16 space-y-16">
+    <!-- 📢 AD SPACE 1 (TOP) -->
+    <div class="container mx-auto px-4 mt-4">
+        <div class="w-full h-20 bg-gray-100 border border-dashed border-gray-300 rounded-lg flex items-center justify-center text-gray-400 text-sm">
+            <!-- PASTE GOOGLE ADS CODE HERE -->
+            GOOGLE ADS BANNER
+        </div>
+    </div>
 
-        <!-- 1. IMAGE TOOLS -->
+    <!-- SEARCH -->
+    <section class="py-8 text-center px-4">
+        <h1 class="text-3xl md:text-4xl font-bold text-slate-900 mb-2">Master Your <span class="text-brand-600">Digital Life</span></h1>
+        <div class="max-w-md mx-auto relative mt-6">
+            <i class="fa-solid fa-search absolute left-4 top-3.5 text-gray-400"></i>
+            <input type="text" id="toolSearch" placeholder="Search tools..." class="w-full pl-10 p-3 rounded-full border border-gray-300 focus:border-brand-500 outline-none">
+        </div>
+    </section>
+
+    <!-- MAIN TOOLS GRID -->
+    <main class="container mx-auto px-4 pb-24 space-y-12" id="toolsContainer">
+
+        <!-- 1. CLOCK & SCHEDULE (Detailed System) -->
         <section class="tool-category">
-            <div class="flex items-center gap-3 mb-6 border-b pb-2 border-gray-200">
-                <div class="bg-blue-100 text-blue-600 p-2 rounded-lg"><i class="fa-solid fa-image"></i></div>
-                <div>
-                    <h2 class="text-2xl font-bold text-gray-800">Image Tools</h2>
-                    <p class="text-sm text-gray-500">Edit, convert, and optimize images.</p>
+            <h2 class="text-xl font-bold mb-4 flex items-center gap-2"><i class="fa-regular fa-clock text-blue-500"></i> Time Management</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="tool-card p-5 rounded-xl cursor-pointer" onclick="openTool('clockTool')">
+                    <div class="bg-blue-50 w-10 h-10 rounded-lg flex items-center justify-center text-blue-600 mb-2"><i class="fa-solid fa-earth-americas"></i></div>
+                    <h3 class="font-bold">World Clock & Alarm</h3><p class="text-xs text-gray-500">Live time & alerts.</p>
                 </div>
-            </div>
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                <!-- Tool Cards -->
-                <div class="tool-card bg-white p-5 rounded-xl shadow-sm border border-gray-100 cursor-pointer" onclick="openTool('imgConvert')"><h3 class="font-bold text-lg mb-1">Image Converter</h3><p class="text-xs text-gray-500 mb-3">JPG, PNG, WEBP conversion.</p><span class="text-chronos-600 text-sm font-semibold">Use Tool &rarr;</span></div>
-                <div class="tool-card bg-white p-5 rounded-xl shadow-sm border border-gray-100 cursor-pointer"><h3 class="font-bold text-lg mb-1">Image Compressor</h3><p class="text-xs text-gray-500 mb-3">Reduce file size.</p><span class="text-chronos-600 text-sm font-semibold">Use Tool &rarr;</span></div>
-                <div class="tool-card bg-white p-5 rounded-xl shadow-sm border border-gray-100 cursor-pointer"><h3 class="font-bold text-lg mb-1">Image Resizer</h3><p class="text-xs text-gray-500 mb-3">Change dimensions.</p><span class="text-chronos-600 text-sm font-semibold">Use Tool &rarr;</span></div>
-                <div class="tool-card bg-white p-5 rounded-xl shadow-sm border border-gray-100 cursor-pointer"><h3 class="font-bold text-lg mb-1">Image Cropper</h3><p class="text-xs text-gray-500 mb-3">Crop to specific ratio.</p><span class="text-chronos-600 text-sm font-semibold">Use Tool &rarr;</span></div>
-                <div class="tool-card bg-white p-5 rounded-xl shadow-sm border border-gray-100 cursor-pointer"><h3 class="font-bold text-lg mb-1">Image to Text (OCR)</h3><p class="text-xs text-gray-500 mb-3">Extract text from image.</p><span class="text-chronos-600 text-sm font-semibold">Use Tool &rarr;</span></div>
-                <div class="tool-card bg-white p-5 rounded-xl shadow-sm border border-gray-100 cursor-pointer"><h3 class="font-bold text-lg mb-1">Remove Background</h3><p class="text-xs text-gray-500 mb-3">Make transparent background.</p><span class="text-chronos-600 text-sm font-semibold">Use Tool &rarr;</span></div>
+                <div class="tool-card p-5 rounded-xl cursor-pointer" onclick="openTool('stopWatch')">
+                    <div class="bg-blue-50 w-10 h-10 rounded-lg flex items-center justify-center text-blue-600 mb-2"><i class="fa-solid fa-stopwatch"></i></div>
+                    <h3 class="font-bold">Stopwatch</h3><p class="text-xs text-gray-500">Lap timer.</p>
+                </div>
+                <div class="tool-card p-5 rounded-xl cursor-pointer" onclick="openTool('bizSched')">
+                    <div class="bg-blue-50 w-10 h-10 rounded-lg flex items-center justify-center text-blue-600 mb-2"><i class="fa-solid fa-briefcase"></i></div>
+                    <h3 class="font-bold">Business Schedule</h3><p class="text-xs text-gray-500">Meeting planner.</p>
+                </div>
+                <div class="tool-card p-5 rounded-xl cursor-pointer" onclick="openTool('gymSched')">
+                    <div class="bg-blue-50 w-10 h-10 rounded-lg flex items-center justify-center text-blue-600 mb-2"><i class="fa-solid fa-dumbbell"></i></div>
+                    <h3 class="font-bold">Gym Schedule</h3><p class="text-xs text-gray-500">Workout logs.</p>
+                </div>
+                <div class="tool-card p-5 rounded-xl cursor-pointer" onclick="openTool('studySched')">
+                    <div class="bg-blue-50 w-10 h-10 rounded-lg flex items-center justify-center text-blue-600 mb-2"><i class="fa-solid fa-graduation-cap"></i></div>
+                    <h3 class="font-bold">Study Focus</h3><p class="text-xs text-gray-500">Pomodoro timer.</p>
+                </div>
             </div>
         </section>
 
-        <!-- 2. AUDIO & VIDEO -->
-        <section class="tool-category">
-            <div class="flex items-center gap-3 mb-6 border-b pb-2 border-gray-200">
-                <div class="bg-red-100 text-red-600 p-2 rounded-lg"><i class="fa-solid fa-video"></i></div>
-                <div>
-                    <h2 class="text-2xl font-bold text-gray-800">Audio & Video</h2>
-                    <p class="text-sm text-gray-500">Compress and clean media files.</p>
-                </div>
-            </div>
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                <div class="tool-card bg-white p-5 rounded-xl shadow-sm border border-gray-100 cursor-pointer"><h3 class="font-bold text-lg mb-1">Audio Compress</h3><p class="text-xs text-gray-500 mb-3">Shrink audio size.</p><span class="text-chronos-600 text-sm font-semibold">Use Tool &rarr;</span></div>
-                <div class="tool-card bg-white p-5 rounded-xl shadow-sm border border-gray-100 cursor-pointer"><h3 class="font-bold text-lg mb-1">Audio Noise Clean</h3><p class="text-xs text-gray-500 mb-3">Remove background noise.</p><span class="text-chronos-600 text-sm font-semibold">Use Tool &rarr;</span></div>
-                <div class="tool-card bg-white p-5 rounded-xl shadow-sm border border-gray-100 cursor-pointer"><h3 class="font-bold text-lg mb-1">Video Compress</h3><p class="text-xs text-gray-500 mb-3">Reduce video size.</p><span class="text-chronos-600 text-sm font-semibold">Use Tool &rarr;</span></div>
-            </div>
-        </section>
+        <!-- 📢 AD SPACE 2 (MIDDLE) -->
+        <div class="w-full h-20 bg-gray-100 border border-dashed border-gray-300 rounded-lg flex items-center justify-center text-gray-400 text-sm">
+            GOOGLE ADS BANNER 2
+        </div>
 
-        <!-- 3. DOCUMENT TOOLS -->
+        <!-- 2. UTILITY TOOLS -->
         <section class="tool-category">
-            <div class="flex items-center gap-3 mb-6 border-b pb-2 border-gray-200">
-                <div class="bg-orange-100 text-orange-600 p-2 rounded-lg"><i class="fa-solid fa-file-pdf"></i></div>
-                <div>
-                    <h2 class="text-2xl font-bold text-gray-800">Document Tools</h2>
-                    <p class="text-sm text-gray-500">Manage PDFs and Docs.</p>
-                </div>
-            </div>
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                <div class="tool-card bg-white p-5 rounded-xl shadow-sm border border-gray-100 cursor-pointer"><h3 class="font-bold text-lg mb-1">PDF to Word</h3><p class="text-xs text-gray-500 mb-3">Convert PDF to Docx.</p><span class="text-chronos-600 text-sm font-semibold">Use Tool &rarr;</span></div>
-                <div class="tool-card bg-white p-5 rounded-xl shadow-sm border border-gray-100 cursor-pointer"><h3 class="font-bold text-lg mb-1">Word to PDF</h3><p class="text-xs text-gray-500 mb-3">Convert Docx to PDF.</p><span class="text-chronos-600 text-sm font-semibold">Use Tool &rarr;</span></div>
-                <div class="tool-card bg-white p-5 rounded-xl shadow-sm border border-gray-100 cursor-pointer"><h3 class="font-bold text-lg mb-1">PDF Merger</h3><p class="text-xs text-gray-500 mb-3">Combine multiple PDFs.</p><span class="text-chronos-600 text-sm font-semibold">Use Tool &rarr;</span></div>
-                <div class="tool-card bg-white p-5 rounded-xl shadow-sm border border-gray-100 cursor-pointer"><h3 class="font-bold text-lg mb-1">PDF Lock/Unlock</h3><p class="text-xs text-gray-500 mb-3">Password protect PDF.</p><span class="text-chronos-600 text-sm font-semibold">Use Tool &rarr;</span></div>
-            </div>
-        </section>
-
-        <!-- 4. CALCULATORS -->
-        <section class="tool-category">
-            <div class="flex items-center gap-3 mb-6 border-b pb-2 border-gray-200">
-                <div class="bg-green-100 text-green-600 p-2 rounded-lg"><i class="fa-solid fa-calculator"></i></div>
-                <div>
-                    <h2 class="text-2xl font-bold text-gray-800">Calculators</h2>
-                    <p class="text-sm text-gray-500">Math, Health, and Finance.</p>
-                </div>
-            </div>
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                <div class="tool-card bg-white p-5 rounded-xl shadow-sm border border-gray-100 cursor-pointer" onclick="openTool('ageCalc')"><h3 class="font-bold text-lg mb-1">Age Calculator</h3><p class="text-xs text-gray-500 mb-3">Exact age calculation.</p><span class="text-chronos-600 text-sm font-semibold">Use Tool &rarr;</span></div>
-                <div class="tool-card bg-white p-5 rounded-xl shadow-sm border border-gray-100 cursor-pointer" onclick="openTool('bmiCalc')"><h3 class="font-bold text-lg mb-1">BMI Calculator</h3><p class="text-xs text-gray-500 mb-3">Body Mass Index.</p><span class="text-chronos-600 text-sm font-semibold">Use Tool &rarr;</span></div>
-                <div class="tool-card bg-white p-5 rounded-xl shadow-sm border border-gray-100 cursor-pointer"><h3 class="font-bold text-lg mb-1">Loan EMI</h3><p class="text-xs text-gray-500 mb-3">Calculate monthly payments.</p><span class="text-chronos-600 text-sm font-semibold">Use Tool &rarr;</span></div>
-                <div class="tool-card bg-white p-5 rounded-xl shadow-sm border border-gray-100 cursor-pointer"><h3 class="font-bold text-lg mb-1">GST Calculator</h3><p class="text-xs text-gray-500 mb-3">Calculate tax.</p><span class="text-chronos-600 text-sm font-semibold">Use Tool &rarr;</span></div>
-            </div>
-        </section>
-
-        <!-- 5. TEXT TOOLS -->
-        <section class="tool-category">
-            <div class="flex items-center gap-3 mb-6 border-b pb-2 border-gray-200">
-                <div class="bg-purple-100 text-purple-600 p-2 rounded-lg"><i class="fa-solid fa-font"></i></div>
-                <div>
-                    <h2 class="text-2xl font-bold text-gray-800">Text Tools</h2>
-                    <p class="text-sm text-gray-500">Format and analyze text.</p>
-                </div>
-            </div>
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                <div class="tool-card bg-white p-5 rounded-xl shadow-sm border border-gray-100 cursor-pointer" onclick="openTool('wordCount')"><h3 class="font-bold text-lg mb-1">Word Counter</h3><p class="text-xs text-gray-500 mb-3">Count words & chars.</p><span class="text-chronos-600 text-sm font-semibold">Use Tool &rarr;</span></div>
-                <div class="tool-card bg-white p-5 rounded-xl shadow-sm border border-gray-100 cursor-pointer" onclick="openTool('caseConv')"><h3 class="font-bold text-lg mb-1">Case Converter</h3><p class="text-xs text-gray-500 mb-3">UPPER & lowercase.</p><span class="text-chronos-600 text-sm font-semibold">Use Tool &rarr;</span></div>
-                <div class="tool-card bg-white p-5 rounded-xl shadow-sm border border-gray-100 cursor-pointer"><h3 class="font-bold text-lg mb-1">Remove Duplicates</h3><p class="text-xs text-gray-500 mb-3">Clean text lists.</p><span class="text-chronos-600 text-sm font-semibold">Use Tool &rarr;</span></div>
-            </div>
-        </section>
-
-        <!-- 6. CLOCK & SCHEDULE -->
-        <section class="tool-category">
-            <div class="flex items-center gap-3 mb-6 border-b pb-2 border-gray-200">
-                <div class="bg-yellow-100 text-yellow-600 p-2 rounded-lg"><i class="fa-solid fa-clock"></i></div>
-                <div>
-                    <h2 class="text-2xl font-bold text-gray-800">Time & Schedule</h2>
-                    <p class="text-sm text-gray-500">Manage your routines.</p>
-                </div>
-            </div>
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                <div class="tool-card bg-white p-5 rounded-xl shadow-sm border border-gray-100 cursor-pointer"><h3 class="font-bold text-lg mb-1">Business Schedule</h3><p class="text-xs text-gray-500 mb-3">Work timeline.</p><span class="text-chronos-600 text-sm font-semibold">Use Tool &rarr;</span></div>
-                <div class="tool-card bg-white p-5 rounded-xl shadow-sm border border-gray-100 cursor-pointer"><h3 class="font-bold text-lg mb-1">Gym Schedule</h3><p class="text-xs text-gray-500 mb-3">Workout logs.</p><span class="text-chronos-600 text-sm font-semibold">Use Tool &rarr;</span></div>
-                <div class="tool-card bg-white p-5 rounded-xl shadow-sm border border-gray-100 cursor-pointer"><h3 class="font-bold text-lg mb-1">Study Timer</h3><p class="text-xs text-gray-500 mb-3">Focus mode.</p><span class="text-chronos-600 text-sm font-semibold">Use Tool &rarr;</span></div>
-            </div>
-        </section>
-
-        <!-- 7. DEV & UTILITY -->
-        <section class="tool-category">
-            <div class="flex items-center gap-3 mb-6 border-b pb-2 border-gray-200">
-                <div class="bg-gray-100 text-gray-600 p-2 rounded-lg"><i class="fa-solid fa-code"></i></div>
-                <div>
-                    <h2 class="text-2xl font-bold text-gray-800">Dev & Utility</h2>
-                    <p class="text-sm text-gray-500">For developers and everyone.</p>
-                </div>
-            </div>
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                <div class="tool-card bg-white p-5 rounded-xl shadow-sm border border-gray-100 cursor-pointer" onclick="openTool('passGen')"><h3 class="font-bold text-lg mb-1">Password Gen</h3><p class="text-xs text-gray-500 mb-3">Secure passwords.</p><span class="text-chronos-600 text-sm font-semibold">Use Tool &rarr;</span></div>
-                <div class="tool-card bg-white p-5 rounded-xl shadow-sm border border-gray-100 cursor-pointer"><h3 class="font-bold text-lg mb-1">QR Generator</h3><p class="text-xs text-gray-500 mb-3">Create QR codes.</p><span class="text-chronos-600 text-sm font-semibold">Use Tool &rarr;</span></div>
-                <div class="tool-card bg-white p-5 rounded-xl shadow-sm border border-gray-100 cursor-pointer"><h3 class="font-bold text-lg mb-1">Color Picker</h3><p class="text-xs text-gray-500 mb-3">HEX & RGB codes.</p><span class="text-chronos-600 text-sm font-semibold">Use Tool &rarr;</span></div>
-                <div class="tool-card bg-white p-5 rounded-xl shadow-sm border border-gray-100 cursor-pointer"><h3 class="font-bold text-lg mb-1">JSON Formatter</h3><p class="text-xs text-gray-500 mb-3">Beautify JSON.</p><span class="text-chronos-600 text-sm font-semibold">Use Tool &rarr;</span></div>
+            <h2 class="text-xl font-bold mb-4 flex items-center gap-2"><i class="fa-solid fa-wrench text-orange-500"></i> Utilities</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="tool-card p-5 rounded-xl cursor-pointer" onclick="openTool('qrGen')"><div class="bg-orange-50 w-10 h-10 rounded-lg flex items-center justify-center text-orange-600 mb-2"><i class="fa-solid fa-qrcode"></i></div><h3 class="font-bold">QR Generator</h3></div>
+                <div class="tool-card p-5 rounded-xl cursor-pointer" onclick="openTool('passGen')"><div class="bg-orange-50 w-10 h-10 rounded-lg flex items-center justify-center text-orange-600 mb-2"><i class="fa-solid fa-key"></i></div><h3 class="font-bold">Password Gen</h3></div>
+                <div class="tool-card p-5 rounded-xl cursor-pointer" onclick="openTool('imgConvert')"><div class="bg-orange-50 w-10 h-10 rounded-lg flex items-center justify-center text-orange-600 mb-2"><i class="fa-solid fa-image"></i></div><h3 class="font-bold">Image Converter</h3></div>
+                <div class="tool-card p-5 rounded-xl cursor-pointer" onclick="openTool('bmiCalc')"><div class="bg-orange-50 w-10 h-10 rounded-lg flex items-center justify-center text-orange-600 mb-2"><i class="fa-solid fa-weight-scale"></i></div><h3 class="font-bold">BMI Calculator</h3></div>
+                <div class="tool-card p-5 rounded-xl cursor-pointer" onclick="openTool('ageCalc')"><div class="bg-orange-50 w-10 h-10 rounded-lg flex items-center justify-center text-orange-600 mb-2"><i class="fa-solid fa-cake-candles"></i></div><h3 class="font-bold">Age Calculator</h3></div>
             </div>
         </section>
 
     </main>
 
-    <!-- PREMIUM CALLOUT -->
-    <div class="bg-chronos-900 text-white py-12 mt-12">
-        <div class="container mx-auto px-4 text-center">
-            <h2 class="text-3xl font-bold mb-4">Go Premium for More Power</h2>
-            <p class="text-chronos-100 mb-8 max-w-xl mx-auto">Get unlimited access, remove ads, and enjoy a faster experience with Chronos Premium. Try it free for 30 days.</p>
-            <div class="flex flex-col md:flex-row gap-4 justify-center">
-                <button class="bg-white text-chronos-900 font-bold py-3 px-8 rounded-full shadow-lg hover:bg-gray-100 transition">Start 30-Day Free Trial</button>
-                <button class="border-2 border-white text-white font-bold py-3 px-8 rounded-full hover:bg-white hover:text-chronos-900 transition">Buy Premium & Remove Ads</button>
+    <!-- MODALS -->
+    
+    <!-- Tool Modal -->
+    <div id="toolModal" class="modal fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div class="absolute inset-0 bg-black/70 backdrop-blur-sm" onclick="closeTool()"></div>
+        <div class="bg-white w-full max-w-lg rounded-2xl shadow-2xl relative z-10 flex flex-col max-h-[90vh]">
+            <div class="p-4 border-b flex justify-between items-center bg-gray-50">
+                <h3 id="modalTitle" class="text-lg font-bold">Tool</h3>
+                <button onclick="closeTool()" class="text-gray-500 hover:text-red-500"><i class="fa-solid fa-times text-xl"></i></button>
             </div>
+            <div id="modalContent" class="p-6 overflow-y-auto"></div>
         </div>
     </div>
 
-    <!-- FOOTER -->
-    <footer class="bg-gray-900 text-white pt-16 pb-8">
-        <div class="container mx-auto px-4 text-center">
-            <div class="flex items-center justify-center gap-2 text-2xl font-bold text-white mb-4">
-                <i class="fa-solid fa-layer-group text-chronos-500"></i>
-                <span>Chronos</span>
-            </div>
-            <p class="text-gray-400 text-sm mb-6">Simplifying your digital life.</p>
-            <div class="text-xs text-gray-500">
-                <a href="#" class="mx-2 hover:text-white">Privacy</a> | 
-                <a href="#" class="mx-2 hover:text-white">Terms</a> | 
-                Email: <span class="text-white">hupboys@gmail.com</span>
-            </div>
-            <div class="border-t border-gray-800 mt-8 pt-4">
-                &copy; 2023 Chronos Multi Tools.
-            </div>
+    <!-- Login Modal -->
+    <div id="loginModal" class="modal fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div class="absolute inset-0 bg-black/80" onclick="closeLogin()"></div>
+        <div class="bg-white w-full max-w-sm rounded-2xl shadow-2xl relative z-10 p-6 text-center">
+            <h2 class="text-2xl font-bold mb-4">Login</h2>
+            <input type="text" id="usernameInput" placeholder="Enter your Name" class="w-full p-3 border rounded-lg mb-4 bg-gray-50">
+            <button onclick="performLogin()" class="w-full bg-brand-600 text-white font-bold py-3 rounded-lg">Start Using</button>
         </div>
-    </footer>
+    </div>
 
-    <!-- MODAL POPUP (TOOL INTERFACE) -->
-    <div id="toolModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden-modal" style="opacity: 0; pointer-events: none;">
-        <div class="bg-white w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden transform scale-95 transition-all" id="modalBox">
-            <div class="p-4 bg-gray-50 border-b flex justify-between items-center">
-                <h3 id="modalTitle" class="text-lg font-bold text-gray-800">Tool Name</h3>
-                <button onclick="closeModal()" class="text-gray-500 hover:text-red-500 text-xl"><i class="fa-solid fa-times"></i></button>
+    <!-- Premium Modal (Payment) -->
+    <div id="premiumModal" class="modal fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div class="absolute inset-0 bg-black/90 backdrop-blur-sm" onclick="closePremium()"></div>
+        <div class="bg-gradient-to-br from-slate-900 to-slate-800 text-white w-full max-w-md rounded-2xl shadow-2xl relative z-10 p-8 text-center border border-yellow-500/50">
+            <i class="fa-solid fa-crown text-4xl text-yellow-400 mb-4"></i>
+            <h2 class="text-2xl font-bold mb-2">Upgrade to Premium</h2>
+            <p class="text-gray-400 mb-6 text-sm">Remove Ads • Cloud Sync • Priority Support</p>
+            
+            <div class="bg-white/10 p-4 rounded-xl mb-6">
+                <p class="text-sm font-mono text-yellow-300 mb-2">LIFETIME ACCESS</p>
+                <p class="text-3xl font-bold">₹199 <span class="text-sm text-gray-400 font-normal">/ one-time</span></p>
             </div>
-            <div id="modalContent" class="p-6">
-                <!-- Tool HTML Injected Here -->
-            </div>
+
+            <!-- PAYMENT BUTTON (UPI) -->
+            <!-- Replace 'yourupi@bank' with YOUR ACTUAL UPI ID -->
+            <a href="upi://pay?pa=gaurav@upi&pn=ChronosTools&am=199&cu=INR" 
+               class="block w-full bg-yellow-500 text-black font-bold py-3 rounded-xl mb-3 hover:bg-yellow-400 transition">
+               Pay via UPI App
+            </a>
+            
+            <button onclick="verifyPayment()" class="text-xs text-gray-400 underline hover:text-white">
+                I have made the payment (Verify)
+            </button>
         </div>
     </div>
 
     <script src="script.js"></script>
 </body>
-            </html>
+        </html>
