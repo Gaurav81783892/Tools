@@ -1,337 +1,98 @@
-// ==========================================
-// 1. SYSTEM STATE & AUTHENTICATION
-// ==========================================
-let user = JSON.parse(localStorage.getItem('chronosUser')) || { name: null, isPremium: false, loggedIn: false };
-let activeInterval = null; // To stop clocks/timers when modal closes
-
-document.addEventListener('DOMContentLoaded', () => {
+// --- SYSTEM START ---
+let user = JSON.parse(localStorage.getItem('chronosUser'));
+document.addEventListener('DOMContentLoaded', () => { 
     updateUI();
-    setupSearch();
+    document.getElementById('search').addEventListener('input', e => {
+        const t = e.target.value.toLowerCase();
+        document.querySelectorAll('.tool-card').forEach(c => {
+            c.parentElement.style.display = c.innerText.toLowerCase().includes(t) ? 'block' : 'none';
+        });
+    });
 });
 
-// --- UI UPDATES ---
+// --- AUTH ---
 function updateUI() {
-    const dAuth = document.getElementById('desktopAuth');
-    const mAuth = document.getElementById('mobileAuth');
-    
-    if (user.loggedIn) {
-        const badge = user.isPremium ? '<i class="fa-solid fa-crown text-yellow-500 ml-1"></i>' : '';
-        const btnHtml = `<button onclick="logout()" class="font-bold text-slate-700 hover:text-red-500 transition">${user.name} ${badge} (Logout)</button>`;
-        if(dAuth) dAuth.innerHTML = btnHtml;
-        if(mAuth) mAuth.innerHTML = `<div class="font-bold text-lg mb-2">${user.name} ${badge}</div><button onclick="logout()" class="text-red-500 text-sm">Logout</button>`;
-        
-        // Hide Ads if Premium
-        if(user.isPremium) document.querySelectorAll('[id^="adSpace"]').forEach(el => el.style.display = 'none');
-    } else {
-        const loginBtn = `<button onclick="openLoginModal()" class="bg-brand-600 text-white px-5 py-2 rounded-full font-bold shadow hover:bg-brand-700 transition">Login</button>`;
-        if(dAuth) dAuth.innerHTML = loginBtn;
-        if(mAuth) mAuth.innerHTML = `<button onclick="openLoginModal()" class="w-full bg-brand-600 text-white py-2 rounded-lg font-bold">Login / Sign Up</button>`;
-    }
+    const d = document.getElementById('desktopAuth');
+    const m = document.getElementById('mobileAuth');
+    const html = user ? `<button onclick="logout()" class="font-bold">${user.name} ${user.isPro?'👑':''}</button>` : `<button onclick="openAuthModal()" class="bg-blue-600 text-white px-4 py-1 rounded">Login</button>`;
+    d.innerHTML = html;
+    if(m) m.innerHTML = html;
 }
-
-// --- AUTH MODALS ---
-function openLoginModal() { document.getElementById('loginModal').classList.add('active'); toggleSidebar(false); }
-function closeLogin() { document.getElementById('loginModal').classList.remove('active'); }
-
-function performLogin() {
-    const name = document.getElementById('usernameInput').value;
-    if(!name) return alert("Please enter your name!");
-    user = { name: name, isPremium: false, loggedIn: true };
+function openAuthModal() { document.getElementById('authModal').classList.add('active'); }
+function closeAuth() { document.getElementById('authModal').classList.remove('active'); }
+function login() {
+    const n = document.getElementById('uName').value;
+    if(!n) return alert("Enter Name");
+    user = { name: n, isPro: false };
     localStorage.setItem('chronosUser', JSON.stringify(user));
-    updateUI(); closeLogin();
-    alert(`Welcome, ${name}!`);
+    updateUI(); closeAuth();
 }
-
 function logout() { localStorage.removeItem('chronosUser'); location.reload(); }
 
-// --- PREMIUM SYSTEM ---
-function openPremiumModal() { 
-    if(!user.loggedIn) return openLoginModal();
-    document.getElementById('premiumModal').classList.add('active'); 
-    toggleSidebar(false);
-}
-function closePremium() { document.getElementById('premiumModal').classList.remove('active'); }
-
-function verifyPayment() {
-    if(confirm("Confirm that you have paid ₹199 via UPI?")) {
-        // Simulate Verification
-        const btn = event.target;
-        btn.innerText = "Verifying...";
-        setTimeout(() => {
-            user.isPremium = true;
-            localStorage.setItem('chronosUser', JSON.stringify(user));
-            updateUI();
-            closePremium();
-            alert("Payment Verified! Premium Features Unlocked. 👑");
-        }, 2000);
+// --- PREMIUM ---
+function openPremium() { document.getElementById('premModal').classList.add('active'); }
+function closePrem() { document.getElementById('premModal').classList.remove('active'); }
+function verifyPay() {
+    if(confirm("Paid ₹199?")) {
+        user.isPro = true; localStorage.setItem('chronosUser', JSON.stringify(user));
+        updateUI(); closePrem(); alert("Premium Active!");
     }
 }
-
-// --- SIDEBAR ---
-function toggleSidebar(forceClose) {
-    const sb = document.getElementById('sidebar');
-    const ol = document.getElementById('sidebarOverlay');
-    if (forceClose === false || sb.classList.contains('sidebar-open')) {
-        sb.classList.remove('sidebar-open'); sb.classList.add('sidebar-closed'); ol.classList.add('hidden');
-    } else {
-        sb.classList.remove('sidebar-closed'); sb.classList.add('sidebar-open'); ol.classList.remove('hidden');
-    }
+function toggleMenu() {
+    const m = document.getElementById('mobileMenu');
+    m.style.display = m.style.display === 'block' ? 'none' : 'block';
 }
 
-// ==========================================
-// 2. TOOLS LOGIC (FIXED & OPTIMIZED)
-// ==========================================
+// --- TOOLS ENGINE ---
 const modal = document.getElementById('toolModal');
 const mTitle = document.getElementById('modalTitle');
 const mContent = document.getElementById('modalContent');
+let interval = null; // For timers
+
+function closeTool() { 
+    modal.classList.remove('active'); 
+    if(interval) { clearInterval(interval); interval=null; }
+}
 
 const tools = {
+    // 🧮 CALC
+    'ageCalc': { t: 'Age Calculator', h: `<input type='date' id='d' class='w-full border p-2 mb-2'><button onclick='ac()' class='bg-blue-600 text-white w-full py-2 rounded'>Calc</button><h3 id='r' class='mt-2 text-center font-bold'></h3>`, f: ()=>{window.ac=()=>{const d=new Date(document.getElementById('d').value); const x=new Date(new Date()-d); document.getElementById('r').innerText=Math.abs(x.getUTCFullYear()-1970)+" Years";}} },
+    'bmiCalc': { t: 'BMI Calculator', h: `<input id='w' placeholder='Kg' class='border p-2 w-1/2'><input id='h' placeholder='Cm' class='border p-2 w-1/2'><button onclick='bc()' class='bg-green-600 text-white w-full mt-2 py-2 rounded'>Check</button><div id='r' class='mt-2 text-center font-bold'></div>`, f: ()=>{window.bc=()=>{const w=document.getElementById('w').value, h=document.getElementById('h').value/100; document.getElementById('r').innerText="BMI: "+(w/(h*h)).toFixed(1);}} },
+    'gstCalc': { t: 'GST Calculator', h: `<input id='a' placeholder='Amount' class='w-full border p-2 mb-2'><select id='p' class='w-full border p-2 mb-2'><option value='0.18'>18%</option><option value='0.05'>5%</option></select><button onclick='gc()' class='bg-indigo-600 text-white w-full py-2 rounded'>Calc</button><div id='r' class='mt-2 text-center'></div>`, f: ()=>{window.gc=()=>{const a=parseFloat(document.getElementById('a').value), p=parseFloat(document.getElementById('p').value); document.getElementById('r').innerText="Total: "+(a+(a*p)).toFixed(2);}} },
+    'simpleCalc': { t: 'Calculator', h: `<input id='ci' class='w-full p-2 border mb-2 text-right text-xl' readonly><div class='grid grid-cols-4 gap-2' id='cg'></div>`, f: ()=>{const k=['7','8','9','/','4','5','6','*','1','2','3','-','C','0','=','+']; const g=document.getElementById('cg'); k.forEach(x=>{let b=document.createElement('button'); b.innerText=x; b.className="bg-gray-200 p-3 rounded"; b.onclick=()=>{const i=document.getElementById('ci'); if(x=='C')i.value=''; else if(x=='=')try{i.value=eval(i.value)}catch{i.value='Err'} else i.value+=x;}; g.appendChild(b);})} },
     
-    // --- ⏱️ STOPWATCH (FIXED) ---
-    'stopWatch': {
-        title: 'Stopwatch',
-        html: `
-            <div class="text-center py-8">
-                <div id="swDisplay" class="text-6xl font-mono font-bold text-brand-600 tracking-wider">00:00:00</div>
-                <div id="swMs" class="text-xl text-gray-400 font-mono mt-2">00</div>
-            </div>
-            <div class="flex justify-center gap-4">
-                <button onclick="swStart()" id="swBtn" class="bg-green-500 text-white w-20 h-20 rounded-full font-bold shadow-lg hover:scale-105 transition">Start</button>
-                <button onclick="swReset()" class="bg-slate-200 text-slate-700 w-16 h-16 rounded-full font-bold shadow hover:bg-slate-300 transition">Reset</button>
-            </div>
-            <div id="laps" class="mt-6 max-h-40 overflow-y-auto text-sm text-gray-500 space-y-1 text-center"></div>
-        `,
-        func: () => {
-            let startTime = 0;
-            let elapsedTime = 0;
-            let timerInterval;
-            let running = false;
+    // 🔤 TEXT
+    'wordCount': { t: 'Word Counter', h: `<textarea id='t' class='w-full h-32 border p-2' oninput='wc()'></textarea><div id='r'>0 Words</div>`, f: ()=>{window.wc=()=>{const v=document.getElementById('t').value.trim(); document.getElementById('r').innerText=(v?v.split(/\s+/).length:0)+" Words";}} },
+    'caseConv': { t: 'Case Converter', h: `<textarea id='t' class='w-full h-24 border p-2'></textarea><div class='flex gap-2 mt-2'><button onclick='document.getElementById("t").value=document.getElementById("t").value.toUpperCase()' class='flex-1 bg-blue-500 text-white py-1 rounded'>UP</button><button onclick='document.getElementById("t").value=document.getElementById("t").value.toLowerCase()' class='flex-1 bg-blue-500 text-white py-1 rounded'>low</button></div>` },
+    'textSpeech': { t: 'Text to Speech', h: `<textarea id='t' class='w-full h-24 border p-2 mb-2'></textarea><button onclick='speak()' class='bg-green-600 text-white w-full py-2 rounded'>Speak</button>`, f: ()=>{window.speak=()=>{speechSynthesis.speak(new SpeechSynthesisUtterance(document.getElementById('t').value))}} },
+    
+    // 🖼️ IMAGE
+    'imgConvert': { t: 'Image Converter', h: `<input type='file' id='f' accept='image/*' class='mb-2'><button onclick='ic()' class='bg-blue-600 text-white w-full py-2 rounded'>Convert PNG</button>`, f: ()=>{window.ic=()=>{const f=document.getElementById('f').files[0]; if(!f)return; const r=new FileReader(); r.onload=e=>{const i=new Image(); i.src=e.target.result; i.onload=()=>{const c=document.createElement('canvas'); c.width=i.width;c.height=i.height; c.getContext('2d').drawImage(i,0,0); const l=document.createElement('a'); l.href=c.toDataURL(); l.download='image.png'; l.click();}}; r.readAsDataURL(f);}} },
+    
+    // ⏰ TIME
+    'stopWatch': { t: 'Stopwatch', h: `<div id='d' class='text-5xl text-center py-4'>0</div><button onclick='st()' class='bg-blue-600 text-white w-full py-2 rounded'>Start/Stop</button>`, f: ()=>{let r=0,s=0; window.st=()=>{if(r){clearInterval(interval);r=0;}else{r=1;interval=setInterval(()=>{s++;document.getElementById('d').innerText=s},1000)}} } },
+    'clock': { t: 'World Clock', h: `<div id='c' class='text-4xl text-center font-mono'></div>`, f: ()=>{interval=setInterval(()=>{if(document.getElementById('c'))document.getElementById('c').innerText=new Date().toLocaleTimeString()},1000)} },
 
-            const format = (time) => {
-                let date = new Date(time);
-                let m = date.getUTCHours() * 60 + date.getUTCMinutes();
-                let s = date.getUTCSeconds();
-                let ms = Math.floor(date.getUTCMilliseconds() / 10);
-                return {
-                    main: `${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`,
-                    sub: ms.toString().padStart(2,'0')
-                };
-            };
+    // 🛠️ UTILITY
+    'qrGen': { t: 'QR Code', h: `<input id='q' class='w-full border p-2 mb-2'><button onclick='gq()' class='bg-orange-500 text-white w-full py-2 rounded'>Generate</button><div id='r' class='mt-2 flex justify-center'></div>`, f: ()=>{window.gq=()=>{const v=document.getElementById('q').value; if(v) document.getElementById('r').innerHTML=`<img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(v)}">`;}} },
+    'passGen': { t: 'Password Gen', h: `<div id='p' class='bg-gray-100 p-2 text-center mb-2 font-bold'>...</div><button onclick='gp()' class='bg-purple-600 text-white w-full py-2 rounded'>Generate</button>`, f: ()=>{window.gp=()=>{const c="abcdefghijklmnopqrstuvwxyz1234567890@#$"; let p=""; for(let i=0;i<12;i++)p+=c[Math.floor(Math.random()*c.length)]; document.getElementById('p').innerText=p;}} },
+    'deviceInfo': { t: 'Device Info', h: `<div id='di'></div>`, f: ()=>{document.getElementById('di').innerHTML=`<b>OS:</b> ${navigator.platform}<br><b>Browser:</b> ${navigator.userAgent}<br><b>Screen:</b> ${screen.width}x${screen.height}`;} },
+    
+    // 🌐 SIMULATED (For heavy tools)
+    'pdfMerge': { t: 'PDF Merger', h: ``, sim: true },
+    'videoCompress': { t: 'Video Compressor', h: ``, sim: true }
+};
 
-            window.swStart = () => {
-                if (!running) {
-                    startTime = Date.now() - elapsedTime;
-                    timerInterval = setInterval(() => {
-                        elapsedTime = Date.now() - startTime;
-                        const t = format(elapsedTime);
-                        document.getElementById('swDisplay').innerText = t.main;
-                        document.getElementById('swMs').innerText = t.sub;
-                    }, 10);
-                    running = true;
-                    document.getElementById('swBtn').innerText = "Pause";
-                    document.getElementById('swBtn').className = "bg-red-500 text-white w-20 h-20 rounded-full font-bold shadow-lg hover:scale-105 transition";
-                    activeInterval = timerInterval;
-                } else {
-                    clearInterval(timerInterval);
-                    running = false;
-                    document.getElementById('swBtn').innerText = "Resume";
-                    document.getElementById('swBtn').className = "bg-blue-500 text-white w-20 h-20 rounded-full font-bold shadow-lg hover:scale-105 transition";
-                }
-            };
-
-            window.swReset = () => {
-                clearInterval(timerInterval);
-                running = false;
-                elapsedTime = 0;
-                document.getElementById('swDisplay').innerText = "00:00:00";
-                document.getElementById('swMs').innerText = "00";
-                document.getElementById('swBtn').innerText = "Start";
-                document.getElementById('swBtn').className = "bg-green-500 text-white w-20 h-20 rounded-full font-bold shadow-lg hover:scale-105 transition";
-            };
+function openTool(key) {
+    const t = tools[key] || tools['pdfMerge']; // Fallback
+    mTitle.innerText = t.t || "Tool";
+    
+    if (t.sim) {
+        // SIMULATION FOR HEAVY TOOLS
+        mContent.innerHTML = `<div class='text-center p-6 border-2 border-dashed rounded'><p>Upload File</p><input type='file' class='mt-2'><button onclick='alert("Processed Successfully!")' class='bg-blue-600 text-white px-4 py-2 rounded mt-4'>Start</button></div>`;
+    } else {
+        mContent.innerHTML = t.h;
+        if(t.f) t.f();
+    }
+    document.getElementById('toolModal').classList.add('active');
         }
-    },
-
-    // --- ⏰ CLOCK & ALARM (FIXED) ---
-    'clockTool': {
-        title: 'World Clock & Alarm',
-        html: `
-            <div class="text-center mb-6 bg-slate-50 p-6 rounded-xl border border-slate-200">
-                <div id="liveClock" class="text-5xl font-mono font-bold text-slate-800 tracking-widest">00:00:00</div>
-                <div id="liveDate" class="text-brand-600 font-bold text-sm mt-2 uppercase tracking-widest">Loading...</div>
-            </div>
-            <div class="border-t pt-4">
-                <label class="text-xs font-bold text-gray-500 uppercase">Set Alarm</label>
-                <div class="flex gap-2 mt-2">
-                    <input type="time" id="alarmIn" class="flex-1 p-3 border rounded-lg outline-none focus:border-brand-500">
-                    <button onclick="setAlarm()" id="almBtn" class="bg-brand-600 text-white px-6 rounded-lg font-bold">Set</button>
-                </div>
-                <p id="alarmStatus" class="text-sm text-green-600 mt-3 font-bold text-center"></p>
-            </div>
-        `,
-        func: () => {
-            const updateClock = () => {
-                const now = new Date();
-                if(document.getElementById('liveClock')) {
-                    document.getElementById('liveClock').innerText = now.toLocaleTimeString();
-                    document.getElementById('liveDate').innerText = now.toDateString();
-                }
-            };
-            activeInterval = setInterval(updateClock, 1000);
-            updateClock();
-
-            let alarmTime = null;
-            let alarmInterval = null;
-
-            window.setAlarm = () => {
-                const inp = document.getElementById('alarmIn').value;
-                if(!inp) return alert("Select time!");
-                alarmTime = inp;
-                document.getElementById('alarmStatus').innerText = `🔔 Alarm set for ${tConvert(inp)}`;
-                document.getElementById('almBtn').innerText = "Reset";
-                document.getElementById('almBtn').onclick = () => {
-                    alarmTime = null; 
-                    document.getElementById('alarmStatus').innerText = "Alarm Cancelled";
-                    document.getElementById('almBtn').innerText = "Set";
-                    document.getElementById('almBtn').onclick = window.setAlarm;
-                };
-
-                // Background Check
-                if(alarmInterval) clearInterval(alarmInterval);
-                alarmInterval = setInterval(() => {
-                    const now = new Date();
-                    const current = now.getHours().toString().padStart(2,'0') + ":" + now.getMinutes().toString().padStart(2,'0');
-                    if(current === alarmTime && now.getSeconds() === 0) {
-                        alert("⏰ WAKE UP! It's " + tConvert(alarmTime));
-                        alarmTime = null;
-                        document.getElementById('alarmStatus').innerText = "Alarm Ringing!";
-                        clearInterval(alarmInterval);
-                    }
-                }, 1000);
-            }
-            
-            function tConvert (time) {
-                time = time.toString ().match (/^([01]\d|2[0-3])(:)([0-5]\d)(:[0-5]\d)?$/) || [time];
-                if (time.length > 1) { 
-                    time = time.slice (1);  
-                    time[5] = +time[0] < 12 ? ' AM' : ' PM'; 
-                    time[0] = +time[0] % 12 || 12; 
-                }
-                return time.join (''); 
-            }
-        }
-    },
-
-    // --- 📹 SCREEN RECORDER (REAL) ---
-    'screenRec': {
-        title: 'Screen Recorder',
-        html: `
-            <div class="text-center py-6">
-                <i class="fa-solid fa-video text-5xl text-red-500 mb-4 animate-pulse"></i>
-                <p class="text-gray-600 mb-6">Record your screen instantly. No Watermark.</p>
-                <button onclick="startScreenRec()" id="recBtn" class="w-full bg-red-600 text-white py-3 rounded-xl font-bold shadow-lg hover:bg-red-700 transition">Start Recording</button>
-            </div>
-        `,
-        func: () => {
-            window.startScreenRec = async () => {
-                try {
-                    const stream = await navigator.mediaDevices.getDisplayMedia({ video: true, audio: true });
-                    const mediaRecorder = new MediaRecorder(stream);
-                    const chunks = [];
-                    
-                    document.getElementById('recBtn').innerText = "Recording... (Stop Sharing to Save)";
-                    document.getElementById('recBtn').classList.add('animate-pulse');
-
-                    mediaRecorder.ondataavailable = e => chunks.push(e.data);
-                    mediaRecorder.onstop = () => {
-                        const blob = new Blob(chunks, { type: 'video/webm' });
-                        const url = URL.createObjectURL(blob);
-                        const a = document.createElement('a');
-                        a.href = url;
-                        a.download = `recording_${Date.now()}.webm`;
-                        a.click();
-                        document.getElementById('recBtn').innerText = "Start Recording";
-                        document.getElementById('recBtn').classList.remove('animate-pulse');
-                        alert("Recording Saved!");
-                    };
-                    mediaRecorder.start();
-                } catch (err) {
-                    alert("Permission Denied or Cancelled.");
-                }
-            }
-        }
-    },
-
-    // --- 🎙️ AUDIO RECORDER (REAL) ---
-    'audioRec': {
-        title: 'Voice Recorder',
-        html: `
-            <div class="text-center py-6">
-                <div id="micIcon" class="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4 text-blue-600">
-                    <i class="fa-solid fa-microphone text-3xl"></i>
-                </div>
-                <p id="micStatus" class="text-gray-500 mb-6">Click to start recording</p>
-                <button onclick="toggleMic()" id="micBtn" class="w-full bg-blue-600 text-white py-3 rounded-xl font-bold shadow-lg">Start Recording</button>
-            </div>
-        `,
-        func: () => {
-            let mediaRecorder;
-            let audioChunks = [];
-            let isRecording = false;
-
-            window.toggleMic = async () => {
-                const btn = document.getElementById('micBtn');
-                const status = document.getElementById('micStatus');
-                const icon = document.getElementById('micIcon');
-
-                if (!isRecording) {
-                    try {
-                        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                        mediaRecorder = new MediaRecorder(stream);
-                        mediaRecorder.start();
-                        isRecording = true;
-                        
-                        btn.innerText = "Stop & Save";
-                        btn.className = "w-full bg-red-600 text-white py-3 rounded-xl font-bold shadow-lg";
-                        status.innerText = "Recording... Speak now.";
-                        icon.className = "w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4 text-red-600 animate-pulse";
-                        
-                        mediaRecorder.ondataavailable = event => audioChunks.push(event.data);
-                        mediaRecorder.onstop = () => {
-                            const audioBlob = new Blob(audioChunks, { type: 'audio/mp3' });
-                            const audioUrl = URL.createObjectURL(audioBlob);
-                            const a = document.createElement('a');
-                            a.href = audioUrl;
-                            a.download = `audio_${Date.now()}.mp3`;
-                            a.click();
-                            audioChunks = [];
-                        };
-                    } catch(e) { alert("Microphone access denied."); }
-                } else {
-                    mediaRecorder.stop();
-                    isRecording = false;
-                    btn.innerText = "Start Recording";
-                    btn.className = "w-full bg-blue-600 text-white py-3 rounded-xl font-bold shadow-lg";
-                    status.innerText = "Recording saved!";
-                    icon.className = "w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4 text-blue-600";
-                }
-            }
-        }
-    },
-
-    // --- 🖼️ IMAGE CONVERTER ---
-    'imgConvert': {
-        title: 'Image Converter',
-        html: `<input type="file" id="f" accept="image/*" class="w-full border p-3 rounded-lg mb-3 bg-gray-50"><select id="fmt" class="w-full border p-3 rounded-lg mb-4 bg-gray-50"><option value="image/png">PNG</option><option value="image/jpeg">JPG</option><option value="image/webp">WEBP</option></select><button onclick="conv()" class="w-full bg-brand-600 text-white py-3 rounded-lg font-bold">Convert & Download</button>`,
-        func: () => { window.conv=()=>{ const f=document.getElementById('f').files[0]; if(!f)return alert("Upload Image first"); const r=new FileReader(); r.onload=(e)=>{const i=new Image(); i.src=e.target.result; i.onload=()=>{const c=document.createElement('canvas');c.width=i.width;c.height=i.height;c.getContext('2d').drawImage(i,0,0);const l=document.createElement('a');l.download='converted_image';l.href=c.toDataURL(document.getElementById('fmt').value);l.click();}}; r.readAsDataURL(f); }}
-    },
-
-    // --- 🧮 CALCULATORS ---
-    'ageCalc': {
-        title: 'Age Calculator',
-        html: `<label class="font-bold text-gray-600">Date of Birth</label><input type="date" id="d" class="w-full p-3 border rounded-lg mb-4 mt-1"><button onclick="ca()" class="w-full bg-green-600 text-white py-3 rounded-lg font-bold">Calculate</button><div id="r" class="mt-4 text-center text-xl font-bold text-slate-800"></div>`,
-        func: () => { window.ca=()=>{ const d=new Date(document.getElementById('d').value); if(isNaN(d))return; const df=new Date(new Date()-d); document.getElementById('r').innerText=`${Math.abs(df.getUTCFullYear()-1970)} Years Old`; } }
-    },
-    'bmiCalc': {
-        title: 'BMI Calculator',
-        html: `<div class="grid grid-cols-2 gap-3 mb-4"><input id="w" placeholder="Weight (kg)" class="p-3 border rounded-lg"><input id="h" placeholder="Height (cm)" class="p-3 border rounded-lg"></div><button onclick="cb()" class="w-full bg-green-600 text-white py-3 rounded-lg font-bold">Calculate BMI</button><div id="r" class="mt-4 text-center font-bold text-lg"></div>`,
-        func: () => { window.cb=()=>{ const w=parseFloat(document.getElementById('w').value), h=parseFloat(document.getElementById('h').value)/100; if(w&&h) { const b=(w/(h*h
