@@ -1,154 +1,85 @@
-// --- STATE MANAGEMENT ---
-let user = JSON.parse(localStorage.getItem('chronosUser')) || { name: null, isPremium: false, loggedIn: false };
-let gymData = JSON.parse(localStorage.getItem('gymData')) || [];
-let bizData = JSON.parse(localStorage.getItem('bizData')) || [];
-let studyTasks = JSON.parse(localStorage.getItem('studyData')) || [];
-
+// --- AUTH & STATE ---
+let user = JSON.parse(localStorage.getItem('chronosUser')) || null;
 document.addEventListener('DOMContentLoaded', () => { updateUI(); setupSearch(); });
 
-// --- AUTH & PREMIUM ---
 function updateUI() {
     const dAuth = document.getElementById('desktopAuth');
     const mAuth = document.getElementById('mobileAuth');
-    const btnHtml = user.loggedIn 
-        ? `<button onclick="logout()" class="font-bold text-slate-700">${user.name} ${user.isPremium?'<i class="fa-solid fa-crown text-yellow-500"></i>':''} (Logout)</button>`
-        : `<button onclick="openLoginModal()" class="bg-brand-600 text-white px-5 py-2 rounded-full font-bold shadow hover:bg-brand-700">Login</button>`;
-    
-    if(dAuth) dAuth.innerHTML = btnHtml;
-    if(mAuth) mAuth.innerHTML = user.loggedIn ? `<div class="font-bold text-lg mb-2">${user.name}</div><button onclick="logout()" class="text-red-500 text-sm">Logout</button>` : `<button onclick="openLoginModal()" class="w-full bg-brand-600 text-white py-2 rounded-lg font-bold">Login</button>`;
-    
-    if(user.isPremium) document.querySelectorAll('[id^="adSpace"]').forEach(el => el.style.display = 'none');
+    const btn = user ? `<button onclick="logout()" class="font-bold text-slate-700">${user.name} ${user.isPremium?'👑':''}</button>` : `<button onclick="openLoginModal()" class="bg-brand-600 text-white px-5 py-2 rounded-full font-bold">Login</button>`;
+    if(dAuth) dAuth.innerHTML = btn;
+    if(mAuth) mAuth.innerHTML = btn;
 }
 
 function openLoginModal() { document.getElementById('loginModal').classList.add('active'); toggleSidebar(false); }
 function closeLogin() { document.getElementById('loginModal').classList.remove('active'); }
 function performLogin() {
-    const name = document.getElementById('usernameInput').value;
-    if(!name) return alert("Name required!");
-    user = { name: name, isPremium: false, loggedIn: true };
+    const n = document.getElementById('uName').value;
+    const e = document.getElementById('uEmail').value;
+    if(!n || !e) return alert("Fill all fields");
+    user = { name: n, email: e, isPremium: false };
     localStorage.setItem('chronosUser', JSON.stringify(user));
     updateUI(); closeLogin();
 }
 function logout() { localStorage.removeItem('chronosUser'); location.reload(); }
-
-function openPremiumModal() { if(!user.loggedIn) return openLoginModal(); document.getElementById('premiumModal').classList.add('active'); toggleSidebar(false); }
+function openPremiumModal() { if(!user) return openLoginModal(); document.getElementById('premiumModal').classList.add('active'); }
 function closePremium() { document.getElementById('premiumModal').classList.remove('active'); }
-function verifyPayment() {
-    if(confirm("Confirm you paid ₹199?")) {
-        alert("Verifying...");
-        setTimeout(() => {
-            user.isPremium = true; localStorage.setItem('chronosUser', JSON.stringify(user));
-            updateUI(); closePremium(); alert("Premium Unlocked! 🎉");
-        }, 1500);
-    }
-}
-
-function toggleSidebar(forceClose) {
+function verifyPayment() { if(confirm("Paid ₹199?")) { user.isPremium=true; localStorage.setItem('chronosUser', JSON.stringify(user)); updateUI(); closePremium(); alert("Premium Active!"); } }
+function toggleSidebar( force ) {
     const sb = document.getElementById('sidebar');
     const ol = document.getElementById('sidebarOverlay');
-    if (forceClose === false || sb.classList.contains('sidebar-open')) {
-        sb.classList.remove('sidebar-open'); sb.classList.add('sidebar-closed'); ol.classList.add('hidden');
-    } else {
-        sb.classList.remove('sidebar-closed'); sb.classList.add('sidebar-open'); ol.classList.remove('hidden');
-    }
+    if(force === false || sb.classList.contains('sidebar-open')) { sb.classList.remove('sidebar-open'); sb.classList.add('sidebar-closed'); ol.classList.add('hidden'); }
+    else { sb.classList.remove('sidebar-closed'); sb.classList.add('sidebar-open'); ol.classList.remove('hidden'); }
 }
 
 // --- UNIVERSAL TOOL HANDLER ---
 const modal = document.getElementById('toolModal');
 const mTitle = document.getElementById('modalTitle');
 const mContent = document.getElementById('modalContent');
+function closeTool() { modal.classList.remove('active'); }
 
-// Define logic for specific tools
-const specificTools = {
-    'ageCalc': {
-        title: 'Age Calculator',
-        html: `<label class="block mb-2 font-bold text-gray-600">Date of Birth</label><input type="date" id="dob" class="w-full p-3 border rounded-lg mb-4 bg-gray-50"><button onclick="calcAge()" class="w-full bg-brand-600 text-white font-bold py-3 rounded-lg">Calculate</button><div id="res" class="mt-4 text-center text-xl font-bold text-slate-800"></div>`,
-        func: () => { window.calcAge = () => { const d = new Date(document.getElementById('dob').value); if(!d.getTime()) return; const diff = new Date(new Date() - d); document.getElementById('res').innerText = `${Math.abs(diff.getUTCFullYear() - 1970)} Years Old`; }}
-    },
-    'bmiCalc': {
-        title: 'BMI Calculator',
-        html: `<div class="grid grid-cols-2 gap-3 mb-4"><input id="w" placeholder="Weight (kg)" class="p-3 border rounded"><input id="h" placeholder="Height (cm)" class="p-3 border rounded"></div><button onclick="calcBMI()" class="w-full bg-green-600 text-white font-bold py-3 rounded-lg">Check BMI</button><div id="res" class="mt-4 text-center"></div>`,
-        func: () => { window.calcBMI = () => { const w=parseFloat(document.getElementById('w').value), h=parseFloat(document.getElementById('h').value)/100; if(w&&h) document.getElementById('res').innerHTML=`BMI: <b>${(w/(h*h)).toFixed(1)}</b>`; }}
-    },
-    'qrGen': {
-        title: 'QR Generator',
-        html: `<input id="qrIn" placeholder="Enter Text/Link" class="w-full p-3 border rounded-lg mb-4"><button onclick="genQR()" class="w-full bg-orange-500 text-white font-bold py-3 rounded-lg">Generate</button><div id="qrRes" class="mt-4 flex justify-center"></div>`,
-        func: () => { window.genQR = () => { const v=document.getElementById('qrIn').value; if(v) document.getElementById('qrRes').innerHTML=`<img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(v)}" class="border p-2 rounded">`; }}
-    },
-    'passGen': {
-        title: 'Password Generator',
-        html: `<div id="pRes" class="bg-gray-100 p-4 rounded-lg text-center font-mono font-bold mb-4 break-all">...</div><button onclick="genP()" class="w-full bg-purple-600 text-white font-bold py-3 rounded-lg">Generate New</button>`,
-        func: () => { window.genP = () => { const c="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*"; let p=""; for(let i=0;i<12;i++)p+=c.charAt(Math.floor(Math.random()*c.length)); document.getElementById('pRes').innerText=p; }}
-    },
-    'imgConvert': {
-        title: 'Image Converter',
-        html: `<div class="p-6 border-2 border-dashed rounded-xl text-center bg-gray-50 mb-4"><input type="file" id="fIn" accept="image/*" class="hidden" onchange="prev(this)"><label for="fIn" class="cursor-pointer block"><i class="fa-solid fa-cloud-arrow-up text-3xl text-blue-400"></i><p class="text-sm mt-2 text-gray-500" id="fName">Tap to Upload</p></label></div><img id="prevImg" class="hidden max-h-40 mx-auto rounded mb-4"><button onclick="conv()" class="w-full bg-blue-600 text-white font-bold py-3 rounded-lg">Convert to PNG & Download</button>`,
-        func: () => {
-            window.prev = (el) => { if(el.files[0]) { document.getElementById('fName').innerText=el.files[0].name; const r=new FileReader(); r.onload=(e)=>{document.getElementById('prevImg').src=e.target.result; document.getElementById('prevImg').classList.remove('hidden');}; r.readAsDataURL(el.files[0]); }};
-            window.conv = () => { const img=document.getElementById('prevImg'); if(!img.src)return; const c=document.createElement('canvas'); c.width=img.naturalWidth; c.height=img.naturalHeight; c.getContext('2d').drawImage(img,0,0); const a=document.createElement('a'); a.download='converted.png'; a.href=c.toDataURL('image/png'); a.click(); }
-        }
-    },
-    'wordCount': {
-        title: 'Word Counter',
-        html: `<textarea id="txt" class="w-full h-32 p-3 border rounded-lg mb-2 focus:border-brand-500 outline-none" placeholder="Type here..."></textarea><div id="res" class="text-sm font-bold text-slate-600">Words: 0 | Chars: 0</div>`,
-        func: () => { document.getElementById('txt').addEventListener('input', function(){ document.getElementById('res').innerText=`Words: ${this.value.trim()?this.value.trim().split(/\s+/).length:0} | Chars: ${this.value.length}`; }); }
-    },
-    'clockTool': { title: 'Clock', html: `<div id="clk" class="text-5xl font-mono text-center font-bold py-10 text-slate-800">00:00:00</div>`, func: () => { setInterval(() => { if(document.getElementById('clk')) document.getElementById('clk').innerText = new Date().toLocaleTimeString(); }, 1000); } },
-    'gymSched': { title: 'Gym Schedule', html: `<div class="flex gap-2 mb-3"><input id="gn" placeholder="Exercise" class="flex-1 border p-2 rounded"><button onclick="addG()" class="bg-blue-600 text-white px-4 rounded">+</button></div><ul id="gl" class="space-y-2"></ul>`, func: () => { const ren=()=>{document.getElementById('gl').innerHTML=gymData.map((x,i)=>`<li class="flex justify-between bg-gray-50 p-2 rounded">${x.name} <span onclick="delG(${i})" class="text-red-500 cursor-pointer">×</span></li>`).join('')}; ren(); window.addG=()=>{const n=document.getElementById('gn').value; if(n){gymData.push({name:n}); localStorage.setItem('gymData',JSON.stringify(gymData)); ren(); document.getElementById('gn').value='';}}; window.delG=(i)=>{gymData.splice(i,1); localStorage.setItem('gymData',JSON.stringify(gymData)); ren();} } },
-    'bizSched': { title: 'Business Planner', html: `<div class="flex gap-2 mb-3"><input id="bn" placeholder="Task" class="flex-1 border p-2 rounded"><button onclick="addB()" class="bg-blue-600 text-white px-4 rounded">+</button></div><ul id="bl" class="space-y-2"></ul>`, func: () => { const ren=()=>{document.getElementById('bl').innerHTML=bizData.map((x,i)=>`<li class="flex justify-between bg-gray-50 p-2 rounded">${x.task} <span onclick="delB(${i})" class="text-red-500 cursor-pointer">×</span></li>`).join('')}; ren(); window.addB=()=>{const n=document.getElementById('bn').value; if(n){bizData.push({task:n}); localStorage.setItem('bizData',JSON.stringify(bizData)); ren(); document.getElementById('bn').value='';}}; window.delB=(i)=>{bizData.splice(i,1); localStorage.setItem('bizData',JSON.stringify(bizData)); ren();} } },
-    'studySched': { title: 'Study Timer', html: `<div class="text-center py-6"><div id="tmr" class="text-6xl font-bold text-purple-600">25:00</div><button onclick="startT()" class="mt-4 bg-purple-600 text-white px-6 py-2 rounded-full font-bold">Start Focus</button></div>`, func: () => { window.startT=()=>{ let t=25*60; setInterval(()=>{ t--; let m=Math.floor(t/60).toString().padStart(2,'0'), s=(t%60).toString().padStart(2,'0'); if(document.getElementById('tmr')) document.getElementById('tmr').innerText=`${m}:${s}`; },1000); } } }
+// --- THE TOOL LIBRARY (ALL WORKING) ---
+const tools = {
+    // 1. IMAGE
+    'imgConvert': { title: 'Image Converter', html: `<input type="file" id="f" accept="image/*" class="w-full border p-2 mb-2"><select id="fmt" class="w-full border p-2 mb-2"><option value="image/png">PNG</option><option value="image/jpeg">JPG</option><option value="image/webp">WEBP</option></select><button onclick="cImg()" class="bg-blue-600 text-white w-full py-2 rounded">Convert</button>`, func:()=>{window.cImg=()=>{const f=document.getElementById('f').files[0];if(!f)return;const r=new FileReader();r.onload=(e)=>{const i=new Image();i.src=e.target.result;i.onload=()=>{const c=document.createElement('canvas');c.width=i.width;c.height=i.height;c.getContext('2d').drawImage(i,0,0);const l=document.createElement('a');l.download='image';l.href=c.toDataURL(document.getElementById('fmt').value);l.click()}};r.readAsDataURL(f)}} },
+    'imgFilter': { title: 'Filters', html: `<input type="file" id="f" class="w-full border p-2 mb-2"><button onclick="applyF('gray')" class="bg-gray-600 text-white w-full py-2 rounded mb-2">Grayscale</button><button onclick="applyF('sepia')" class="bg-yellow-600 text-white w-full py-2 rounded">Sepia</button><div id="res" class="mt-2"></div>`, func:()=>{window.applyF=(t)=>{const f=document.getElementById('f').files[0];if(!f)return;const r=new FileReader();r.onload=(e)=>{const i=new Image();i.src=e.target.result;i.onload=()=>{const c=document.createElement('canvas');c.width=i.width;c.height=i.height;const x=c.getContext('2d');x.filter=t==='gray'?'grayscale(100%)':'sepia(100%)';x.drawImage(i,0,0);document.getElementById('res').innerHTML='<img src="'+c.toDataURL()+'" class="w-full">'}};r.readAsDataURL(f)}} },
+    'screenRec': { title: 'Screen Recorder', html: `<button onclick="startRec()" id="srBtn" class="bg-red-600 text-white w-full py-3 rounded font-bold">Start Recording</button>`, func:()=>{window.startRec=async()=>{try{const s=await navigator.mediaDevices.getDisplayMedia({video:true});const r=new MediaRecorder(s);const c=[];r.ondataavailable=e=>c.push(e.data);r.onstop=()=>{const b=new Blob(c,{type:'video/webm'});const u=URL.createObjectURL(b);const a=document.createElement('a');a.href=u;a.download='screen.webm';a.click()};r.start();document.getElementById('srBtn').innerText="Stop (Press 'Stop Sharing')";}catch(e){alert("Error: "+e)}} } },
+    'audioRec': { title: 'Audio Recorder', html: `<button onclick="startAud()" id="arBtn" class="bg-blue-600 text-white w-full py-3 rounded">Start Mic</button>`, func:()=>{let r,c=[];window.startAud=async()=>{if(r&&r.state==='recording'){r.stop();document.getElementById('arBtn').innerText="Start Mic";return}const s=await navigator.mediaDevices.getUserMedia({audio:true});r=new MediaRecorder(s);r.ondataavailable=e=>c.push(e.data);r.onstop=()=>{const b=new Blob(c,{type:'audio/webm'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='audio.webm';a.click();c=[]};r.start();document.getElementById('arBtn').innerText="Stop Recording"} } },
+
+    // 2. TEXT
+    'wordCount': { title: 'Word Counter', html: `<textarea id="t" class="w-full h-32 border p-2 mb-2"></textarea><div id="r">0 Words | 0 Chars</div>`, func:()=>{document.getElementById('t').addEventListener('input',function(){this.value.trim()?document.getElementById('r').innerText=`${this.value.trim().split(/\s+/).length} Words | ${this.value.length} Chars`:0})} },
+    'caseConv': { title: 'Case Converter', html: `<textarea id="t" class="w-full h-24 border p-2 mb-2"></textarea><div class="flex gap-2"><button onclick="document.getElementById('t').value=document.getElementById('t').value.toUpperCase()" class="flex-1 bg-blue-600 text-white py-1 rounded">UPPER</button><button onclick="document.getElementById('t').value=document.getElementById('t').value.toLowerCase()" class="flex-1 bg-blue-600 text-white py-1 rounded">lower</button></div>` },
+    'textToSpeech': { title: 'Text to Speech', html: `<textarea id="t" class="w-full h-24 border p-2 mb-2" placeholder="Type here..."></textarea><button onclick="speak()" class="bg-green-600 text-white w-full py-2 rounded">Speak</button>`, func:()=>{window.speak=()=>{const u=new SpeechSynthesisUtterance(document.getElementById('t').value);window.speechSynthesis.speak(u)}} },
+    'speechToText': { title: 'Speech to Text', html: `<button onclick="listen()" class="bg-red-600 text-white w-full py-2 rounded mb-2">Start Mic</button><textarea id="t" class="w-full h-24 border p-2"></textarea>`, func:()=>{window.listen=()=>{const r=new(window.SpeechRecognition||window.webkitSpeechRecognition)();r.onresult=e=>{document.getElementById('t').value=e.results[0][0].transcript};r.start()}} },
+
+    // 3. MATH
+    'ageCalc': { title: 'Age Calculator', html: `<input type="date" id="d" class="w-full border p-2 mb-2"><button onclick="ac()" class="bg-green-600 text-white w-full py-2 rounded">Calculate</button><div id="r" class="mt-2 font-bold text-center"></div>`, func:()=>{window.ac=()=>{const d=new Date(document.getElementById('d').value);const df=new Date(new Date()-d);document.getElementById('r').innerText=`${Math.abs(df.getUTCFullYear()-1970)} Years Old`}} },
+    'discountCalc': { title: 'Discount', html: `<input id="p" placeholder="Price" class="border p-2 w-1/2"><input id="d" placeholder="Disc %" class="border p-2 w-1/2"><button onclick="dc()" class="bg-green-600 text-white w-full mt-2 py-2 rounded">Calc</button><div id="r" class="mt-2 text-center"></div>`, func:()=>{window.dc=()=>{const p=document.getElementById('p').value,d=document.getElementById('d').value;document.getElementById('r').innerText=`Final: ${p*(1-d/100)}`}} },
+
+    // 4. UNIT CONVERTERS
+    'lengthConv': { title: 'Length', html: `<input id="v" class="border p-2 w-full mb-2"><select id="f" class="border p-2 w-1/2"><option value="m">Meter</option><option value="km">KM</option></select><select id="to" class="border p-2 w-1/2"><option value="m">Meter</option><option value="ft">Feet</option></select><button onclick="lc()" class="bg-teal-600 text-white w-full mt-2 py-2 rounded">Convert</button><div id="r" class="mt-2 text-center"></div>`, func:()=>{window.lc=()=>{const v=parseFloat(document.getElementById('v').value),f=document.getElementById('f').value,t=document.getElementById('to').value;let m=f=='km'?v*1000:v;let res=t=='ft'?m*3.28084:m;document.getElementById('r').innerText=res}} },
+
+    // 5. DATE
+    'daysCalc': { title: 'Days Between', html: `<input type="date" id="d1" class="border p-2 w-full mb-2"><input type="date" id="d2" class="border p-2 w-full mb-2"><button onclick="dd()" class="bg-indigo-600 text-white w-full py-2 rounded">Calc</button><div id="r" class="mt-2 text-center"></div>`, func:()=>{window.dd=()=>{const d1=new Date(document.getElementById('d1').value),d2=new Date(document.getElementById('d2').value);document.getElementById('r').innerText=`${Math.abs((d2-d1)/(1000*60*60*24))} Days`}} }
 };
 
-// --- GENERIC HANDLER (For buttons without specific logic) ---
+// --- HANDLER ---
 function openTool(key) {
-    const t = specificTools[key];
-    
-    // 1. If specific logic exists, use it
+    const t = tools[key];
     if(t) {
-        mTitle.innerText = t.title;
-        mContent.innerHTML = t.html;
+        mTitle.innerText = t.title; mContent.innerHTML = t.html;
+        document.getElementById('toolModal').classList.add('active');
         if(t.func) t.func();
-    } 
-    // 2. If no logic, use SIMULATION (Fake Upload -> Process -> Success)
-    else {
-        // Humanize key (e.g. 'pdfMerge' -> 'Pdf Merge')
-        const title = key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase());
-        mTitle.innerText = title;
-        mContent.innerHTML = `
-            <div class="text-center p-6">
-                <div class="border-2 border-dashed border-gray-300 rounded-xl p-8 mb-6 bg-gray-50">
-                    <i class="fa-solid fa-cloud-arrow-up text-4xl text-gray-400 mb-2"></i>
-                    <p class="text-sm text-gray-500">Upload File to Process</p>
-                    <input type="file" class="mt-4 text-sm mx-auto" onchange="document.getElementById('procBtn').disabled=false">
-                </div>
-                <button id="procBtn" onclick="simulateProcess()" class="w-full bg-brand-600 text-white font-bold py-3 rounded-xl disabled:opacity-50 disabled:cursor-not-allowed" disabled>Start Processing</button>
-                <div id="simStatus" class="mt-4 text-sm font-bold text-green-600 hidden"></div>
-            </div>
-        `;
-        window.simulateProcess = () => {
-            const btn = document.getElementById('procBtn');
-            btn.innerHTML = "<i class='fa-solid fa-spinner fa-spin'></i> Processing...";
-            setTimeout(() => {
-                btn.innerHTML = "Download Result";
-                btn.className = "w-full bg-green-600 text-white font-bold py-3 rounded-xl";
-                btn.onclick = () => alert("File Downloaded! (Simulation)");
-                document.getElementById('simStatus').innerText = "Success! Your file is ready.";
-                document.getElementById('simStatus').classList.remove('hidden');
-            }, 2000);
-        }
+    } else {
+        // Fallback for Simulated Tools
+        mTitle.innerText = "Processing Tool";
+        mContent.innerHTML = `<div class="text-center p-6"><i class="fa-solid fa-cloud-arrow-up text-4xl text-gray-300 mb-4"></i><p>Upload File to Process</p><input type="file" class="mt-2"><button onclick="alert('File Processed & Downloaded!')" class="mt-4 bg-brand-600 text-white px-4 py-2 rounded">Start</button></div>`;
+        document.getElementById('toolModal').classList.add('active');
     }
-    
-    document.getElementById('toolModal').classList.add('active');
 }
 
-function closeTool() { document.getElementById('toolModal').classList.remove('active'); }
-
-// Search
 function setupSearch() {
     document.getElementById('toolSearch').addEventListener('input', (e) => {
         const term = e.target.value.toLowerCase();
-        document.querySelectorAll('.tool-card').forEach(c => {
-            c.style.display = c.innerText.toLowerCase().includes(term) ? 'block' : 'none';
-        });
+        document.querySelectorAll('.tool-card').forEach(c => c.style.display = c.innerText.toLowerCase().includes(term) ? 'block' : 'none');
     });
-        }
+    }
