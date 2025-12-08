@@ -1,237 +1,191 @@
-// --- USER MANAGEMENT ---
-let user = JSON.parse(localStorage.getItem('chronosUser')) || { name: null, isPremium: false, loggedIn: false };
-let gymData = JSON.parse(localStorage.getItem('gymData')) || [];
-let bizData = JSON.parse(localStorage.getItem('bizData')) || [];
-let studyTasks = JSON.parse(localStorage.getItem('studyData')) || [];
-
-document.addEventListener('DOMContentLoaded', () => {
-    updateUI();
-    setupSearch();
-});
-
-// --- AUTH & UI ---
-function updateUI() {
-    const dAuth = document.getElementById('desktopAuth');
-    const mAuth = document.getElementById('mobileAuth');
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chronos Tools | Ultimate Suite</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
     
-    if(user.loggedIn) {
-        let badge = user.isPremium ? '<span class="bg-yellow-100 text-yellow-700 text-xs px-2 py-0.5 rounded ml-1">PRO</span>' : '';
-        const html = `<div><span class="font-bold">${user.name}</span> ${badge}</div><button onclick="logout()" class="text-xs text-red-500">Logout</button>`;
-        dAuth.innerHTML = `<button onclick="logout()" class="font-bold text-slate-700 hover:text-red-500">${user.name} ${badge}</button>`;
-        if(mAuth) mAuth.innerHTML = html;
-        
-        // Hide Ads if Premium
-        if(user.isPremium) {
-            document.querySelectorAll('.container .w-full.h-20').forEach(ad => ad.style.display = 'none');
-        }
-    } else {
-        dAuth.innerHTML = `<button onclick="openLoginModal()" class="bg-brand-600 text-white px-4 py-2 rounded-full font-bold">Login</button>`;
-        if(mAuth) mAuth.innerHTML = `<button onclick="openLoginModal()" class="w-full bg-brand-600 text-white py-2 rounded-lg">Login</button>`;
-    }
-}
-
-function openLoginModal() { document.getElementById('loginModal').classList.add('active'); toggleSidebar(false); }
-function closeLogin() { document.getElementById('loginModal').classList.remove('active'); }
-function performLogin() {
-    const name = document.getElementById('usernameInput').value;
-    if(!name) return;
-    user = { name: name, isPremium: false, loggedIn: true };
-    localStorage.setItem('chronosUser', JSON.stringify(user));
-    updateUI(); closeLogin();
-}
-function logout() { localStorage.removeItem('chronosUser'); location.reload(); }
-
-// --- PREMIUM PAYMENT SYSTEM ---
-function openPremiumModal() { 
-    if(!user.loggedIn) return openLoginModal();
-    document.getElementById('premiumModal').classList.add('active'); 
-    toggleSidebar(false);
-}
-function closePremium() { document.getElementById('premiumModal').classList.remove('active'); }
-
-// Manual Verify Simulation
-function verifyPayment() {
-    if(confirm("Did you complete the payment of ₹199?")) {
-        alert("Thanks! Verifying transaction...");
-        setTimeout(() => {
-            user.isPremium = true;
-            localStorage.setItem('chronosUser', JSON.stringify(user));
-            updateUI();
-            closePremium();
-            alert("Premium Activated Successfully! 🎉");
-        }, 2000);
-    }
-}
-
-function toggleSidebar(forceClose) {
-    const sb = document.getElementById('sidebar');
-    const ol = document.getElementById('sidebarOverlay');
-    if (forceClose === false || sb.classList.contains('sidebar-open')) {
-        sb.classList.remove('sidebar-open');
-        sb.classList.add('sidebar-closed');
-        ol.classList.add('hidden');
-    } else {
-        sb.classList.remove('sidebar-closed');
-        sb.classList.add('sidebar-open');
-        ol.classList.remove('hidden');
-    }
-}
-
-// --- TOOLS LOGIC ---
-const modal = document.getElementById('toolModal');
-const mTitle = document.getElementById('modalTitle');
-const mContent = document.getElementById('modalContent');
-
-const tools = {
-    // 1. CLOCK & ALARM
-    'clockTool': {
-        title: 'World Clock & Alarm',
-        html: `
-            <div class="text-center mb-6">
-                <div id="liveClock" class="text-5xl font-mono font-bold text-slate-800">00:00:00</div>
-                <div id="liveDate" class="text-gray-500 text-sm">Date</div>
-            </div>
-            <div class="border-t pt-4">
-                <label class="text-xs font-bold text-gray-500">SET ALARM</label>
-                <div class="flex gap-2 mt-1">
-                    <input type="time" id="alarmIn" class="flex-1 p-2 border rounded">
-                    <button onclick="setAlarm()" class="bg-blue-600 text-white px-4 rounded font-bold">ON</button>
-                </div>
-                <p id="alarmStatus" class="text-xs text-green-600 mt-2 font-bold"></p>
-            </div>`,
-        func: () => {
-            setInterval(() => {
-                const now = new Date();
-                if(document.getElementById('liveClock')) {
-                    document.getElementById('liveClock').innerText = now.toLocaleTimeString();
-                    document.getElementById('liveDate').innerText = now.toDateString();
-                }
-            }, 1000);
-            window.setAlarm = () => {
-                const t = document.getElementById('alarmIn').value;
-                if(t) {
-                    document.getElementById('alarmStatus').innerText = `Alarm: ${t}`;
-                    setInterval(() => {
-                        const n = new Date();
-                        if(`${n.getHours().toString().padStart(2,'0')}:${n.getMinutes().toString().padStart(2,'0')}` === t && n.getSeconds() === 0) {
-                            alert("⏰ WAKE UP!");
-                        }
-                    }, 1000);
-                }
-            }
-        }
-    },
-
-    // 2. GYM SCHEDULE
-    'gymSched': {
-        title: 'Gym Schedule',
-        html: `
-            <div class="flex gap-2 mb-4">
-                <input id="exName" placeholder="Exercise" class="flex-1 p-2 border rounded">
-                <input id="exSets" placeholder="Sets" type="number" class="w-20 p-2 border rounded">
-                <button onclick="addGym()" class="bg-blue-600 text-white px-3 rounded">+</button>
-            </div>
-            <ul id="gymList" class="space-y-2"></ul>`,
-        func: () => {
-            const render = () => {
-                document.getElementById('gymList').innerHTML = gymData.map((x,i) => 
-                    `<li class="flex justify-between bg-gray-50 p-2 rounded border"><span><b>${x.name}</b> (${x.sets} sets)</span><button onclick="delGym(${i})" class="text-red-500">×</button></li>`
-                ).join('');
-            };
-            render();
-            window.addGym = () => {
-                const n = document.getElementById('exName').value, s = document.getElementById('exSets').value;
-                if(n) { gymData.push({name:n, sets:s}); localStorage.setItem('gymData', JSON.stringify(gymData)); render(); document.getElementById('exName').value=''; }
-            };
-            window.delGym = (i) => { gymData.splice(i,1); localStorage.setItem('gymData', JSON.stringify(gymData)); render(); };
-        }
-    },
-
-    // 3. BUSINESS SCHEDULE
-    'bizSched': {
-        title: 'Business Planner',
-        html: `
-            <div class="flex gap-2 mb-4">
-                <input id="bizTask" placeholder="Meeting / Task" class="flex-1 p-2 border rounded">
-                <input id="bizTime" type="time" class="p-2 border rounded">
-                <button onclick="addBiz()" class="bg-blue-600 text-white px-3 rounded">+</button>
-            </div>
-            <ul id="bizList" class="space-y-2"></ul>`,
-        func: () => {
-            const render = () => {
-                document.getElementById('bizList').innerHTML = bizData.map((x,i) => 
-                    `<li class="flex justify-between bg-blue-50 p-2 rounded border border-blue-100"><div><b>${x.task}</b><br><span class="text-xs text-gray-500">${x.time}</span></div><button onclick="delBiz(${i})" class="text-blue-500">✓</button></li>`
-                ).join('');
-            };
-            render();
-            window.addBiz = () => {
-                const t = document.getElementById('bizTask').value, tm = document.getElementById('bizTime').value;
-                if(t) { bizData.push({task:t, time:tm}); localStorage.setItem('bizData', JSON.stringify(bizData)); render(); document.getElementById('bizTask').value=''; }
-            };
-            window.delBiz = (i) => { bizData.splice(i,1); localStorage.setItem('bizData', JSON.stringify(bizData)); render(); };
-        }
-    },
-
-    // 4. STOPWATCH
-    'stopWatch': {
-        title: 'Stopwatch',
-        html: `<div class="text-center text-5xl font-mono font-bold py-6 text-blue-600" id="swDisplay">00:00:00</div><div class="flex justify-center gap-4"><button onclick="swToggle()" class="bg-green-500 text-white px-6 py-2 rounded-full font-bold" id="swBtn">Start</button><button onclick="swReset()" class="bg-gray-500 text-white px-6 py-2 rounded-full font-bold">Reset</button></div>`,
-        func: () => {
-            let t, sec=0, run=false;
-            const fmt = s => new Date(s * 1000).toISOString().substr(11, 8);
-            window.swToggle = () => {
-                if(!run) { run=true; document.getElementById('swBtn').innerText="Stop"; document.getElementById('swBtn').className="bg-red-500 text-white px-6 py-2 rounded-full font-bold"; t=setInterval(()=>{sec++; document.getElementById('swDisplay').innerText=fmt(sec)}, 1000); }
-                else { run=false; clearInterval(t); document.getElementById('swBtn').innerText="Start"; document.getElementById('swBtn').className="bg-green-500 text-white px-6 py-2 rounded-full font-bold"; }
-            };
-            window.swReset = () => { run=false; clearInterval(t); sec=0; document.getElementById('swDisplay').innerText="00:00:00"; document.getElementById('swBtn').innerText="Start"; document.getElementById('swBtn').className="bg-green-500 text-white px-6 py-2 rounded-full font-bold"; };
-        }
-    },
-
-    // 5. IMAGE CONVERTER
-    'imgConvert': {
-        title: 'Image Converter',
-        html: `<input type="file" id="fIn" class="w-full mb-3 border p-2 rounded" accept="image/*"><button onclick="runImg()" class="w-full bg-blue-600 text-white py-2 rounded font-bold">Convert & Download PNG</button>`,
-        func: () => {
-            window.runImg = () => {
-                const f = document.getElementById('fIn').files[0];
-                if(!f) return alert("Select Image");
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    const img = new Image();
-                    img.src = e.target.result;
-                    img.onload = () => {
-                        const c = document.createElement('canvas');
-                        c.width = img.width; c.height = img.height;
-                        c.getContext('2d').drawImage(img,0,0);
-                        const a = document.createElement('a');
-                        a.href = c.toDataURL('image/png');
-                        a.download = 'converted.png';
-                        a.click();
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Outfit', 'sans-serif'] },
+                    colors: {
+                        brand: { 50: '#f0f9ff', 500: '#0ea5e9', 600: '#0284c7', 900: '#0c4a6e' }
                     }
-                };
-                reader.readAsDataURL(f);
+                }
             }
         }
-    },
-    // GENERIC HANDLER FOR OTHERS
-    'qrGen': { title: 'QR Code', html: `<input id="q" class="w-full p-2 border mb-2"><button onclick="document.getElementById('r').innerHTML='<img src=\\'https://api.qrserver.com/v1/create-qr-code/?size=150x150&data='+document.getElementById('q').value+'\\' class=\\'mx-auto\\'>'" class="w-full bg-orange-500 text-white py-2 rounded">Generate</button><div id="r" class="mt-4"></div>` },
-    'passGen': { title: 'Password', html: `<div id="p" class="bg-gray-100 p-2 text-center mb-2 font-mono font-bold">...</div><button onclick="let c='abcdefghijklmnopqrstuvwxyz0123456789!@#$';let r='';for(let i=0;i<12;i++)r+=c[Math.floor(Math.random()*c.length)];document.getElementById('p').innerText=r" class="w-full bg-green-600 text-white py-2 rounded">Generate</button>` },
-    'ageCalc': { title: 'Age Calculator', html: `<input type="date" id="d" class="w-full p-2 border mb-2"><button onclick="alert(new Date().getFullYear() - new Date(document.getElementById('d').value).getFullYear() + ' Years Old')" class="w-full bg-blue-600 text-white py-2 rounded">Calculate</button>` },
-    'bmiCalc': { title: 'BMI Calculator', html: `<input id="w" placeholder="Kg" class="w-1/2 p-2 border"><input id="h" placeholder="Cm" class="w-1/2 p-2 border"><button onclick="alert('BMI: '+(document.getElementById('w').value/((document.getElementById('h').value/100)**2)).toFixed(1))" class="w-full bg-blue-600 text-white py-2 rounded mt-2">Check</button>` }
-};
+    </script>
+    <style>
+        body { background-color: #f8fafc; }
+        .tool-card { transition: all 0.3s; background: white; border: 1px solid #e2e8f0; }
+        .tool-card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(14, 165, 233, 0.15); border-color: #0ea5e9; }
+        
+        /* Sidebar & Modal Animations */
+        #sidebar { transition: transform 0.3s ease-in-out; }
+        .sidebar-closed { transform: translateX(100%); }
+        .sidebar-open { transform: translateX(0); }
+        .modal { transition: opacity 0.2s, visibility 0.2s; opacity: 0; visibility: hidden; }
+        .modal.active { opacity: 1; visibility: visible; }
+        
+        /* Premium Glow */
+        .premium-border { border: 2px solid #eab308; box-shadow: 0 0 10px rgba(234, 179, 8, 0.3); }
+    </style>
+</head>
+<body class="text-slate-800">
 
-function openTool(key) {
-    const t = tools[key];
-    if(t) {
-        mTitle.innerText = t.title; mContent.innerHTML = t.html; document.getElementById('toolModal').classList.add('active');
-        if(t.func) t.func();
-    } else { alert("Tool under construction"); }
-}
-function closeTool() { document.getElementById('toolModal').classList.remove('active'); }
+    <!-- HEADER -->
+    <header class="sticky top-0 z-40 bg-white/90 backdrop-blur border-b border-slate-200">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <a href="#" class="flex items-center gap-2 text-2xl font-bold text-brand-900">
+                <div class="w-10 h-10 bg-brand-600 rounded-xl flex items-center justify-center text-white"><i class="fa-solid fa-layer-group"></i></div>
+                <span>Chronos</span>
+            </a>
+            
+            <div class="hidden md:flex items-center gap-6">
+                <button onclick="openPremiumModal()" class="text-yellow-600 font-bold hover:text-yellow-700"><i class="fa-solid fa-crown"></i> Go Premium</button>
+                <div id="desktopAuth"></div>
+            </div>
 
-function setupSearch() {
-    document.getElementById('toolSearch').addEventListener('input', (e) => {
-        const term = e.target.value.toLowerCase();
-        document.querySelectorAll('.tool-card').forEach(c => c.style.display = c.innerText.toLowerCase().includes(term) ? 'block' : 'none');
-    });
-}
+            <!-- Hamburger Menu Button -->
+            <button onclick="toggleSidebar()" class="md:hidden text-2xl text-slate-700"><i class="fa-solid fa-bars"></i></button>
+        </div>
+    </header>
+
+    <!-- MOBILE SIDEBAR -->
+    <div id="sidebarOverlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black/50 z-40 hidden"></div>
+    <div id="sidebar" class="fixed top-0 right-0 h-full w-72 bg-white z-50 shadow-2xl sidebar-closed flex flex-col">
+        <div class="p-5 border-b flex justify-between items-center bg-gray-50">
+            <h2 class="font-bold text-lg">Menu</h2>
+            <button onclick="toggleSidebar()" class="text-red-500 text-xl"><i class="fa-solid fa-times"></i></button>
+        </div>
+        <div class="p-5 flex-1 overflow-y-auto space-y-4">
+            <div id="mobileAuth" class="mb-4"></div>
+            <a href="#" onclick="openPremiumModal()" class="flex items-center gap-3 text-yellow-600 font-bold p-2 bg-yellow-50 rounded-lg"><i class="fa-solid fa-crown"></i> Upgrade Plan</a>
+            <a href="mailto:hupboys@gmail.com" class="flex items-center gap-3 text-slate-600 p-2"><i class="fa-solid fa-envelope"></i> Support</a>
+        </div>
+    </div>
+
+    <!-- 📢 AD SPACE 1 (TOP) -->
+    <div class="container mx-auto px-4 mt-4">
+        <div class="w-full h-20 bg-gray-100 border border-dashed border-gray-300 rounded-lg flex items-center justify-center text-gray-400 text-sm">
+            <!-- PASTE GOOGLE ADS CODE HERE -->
+            GOOGLE ADS BANNER
+        </div>
+    </div>
+
+    <!-- SEARCH -->
+    <section class="py-8 text-center px-4">
+        <h1 class="text-3xl md:text-4xl font-bold text-slate-900 mb-2">Master Your <span class="text-brand-600">Digital Life</span></h1>
+        <div class="max-w-md mx-auto relative mt-6">
+            <i class="fa-solid fa-search absolute left-4 top-3.5 text-gray-400"></i>
+            <input type="text" id="toolSearch" placeholder="Search tools..." class="w-full pl-10 p-3 rounded-full border border-gray-300 focus:border-brand-500 outline-none">
+        </div>
+    </section>
+
+    <!-- MAIN TOOLS GRID -->
+    <main class="container mx-auto px-4 pb-24 space-y-12" id="toolsContainer">
+
+        <!-- 1. CLOCK & SCHEDULE (Detailed System) -->
+        <section class="tool-category">
+            <h2 class="text-xl font-bold mb-4 flex items-center gap-2"><i class="fa-regular fa-clock text-blue-500"></i> Time Management</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="tool-card p-5 rounded-xl cursor-pointer" onclick="openTool('clockTool')">
+                    <div class="bg-blue-50 w-10 h-10 rounded-lg flex items-center justify-center text-blue-600 mb-2"><i class="fa-solid fa-earth-americas"></i></div>
+                    <h3 class="font-bold">World Clock & Alarm</h3><p class="text-xs text-gray-500">Live time & alerts.</p>
+                </div>
+                <div class="tool-card p-5 rounded-xl cursor-pointer" onclick="openTool('stopWatch')">
+                    <div class="bg-blue-50 w-10 h-10 rounded-lg flex items-center justify-center text-blue-600 mb-2"><i class="fa-solid fa-stopwatch"></i></div>
+                    <h3 class="font-bold">Stopwatch</h3><p class="text-xs text-gray-500">Lap timer.</p>
+                </div>
+                <div class="tool-card p-5 rounded-xl cursor-pointer" onclick="openTool('bizSched')">
+                    <div class="bg-blue-50 w-10 h-10 rounded-lg flex items-center justify-center text-blue-600 mb-2"><i class="fa-solid fa-briefcase"></i></div>
+                    <h3 class="font-bold">Business Schedule</h3><p class="text-xs text-gray-500">Meeting planner.</p>
+                </div>
+                <div class="tool-card p-5 rounded-xl cursor-pointer" onclick="openTool('gymSched')">
+                    <div class="bg-blue-50 w-10 h-10 rounded-lg flex items-center justify-center text-blue-600 mb-2"><i class="fa-solid fa-dumbbell"></i></div>
+                    <h3 class="font-bold">Gym Schedule</h3><p class="text-xs text-gray-500">Workout logs.</p>
+                </div>
+                <div class="tool-card p-5 rounded-xl cursor-pointer" onclick="openTool('studySched')">
+                    <div class="bg-blue-50 w-10 h-10 rounded-lg flex items-center justify-center text-blue-600 mb-2"><i class="fa-solid fa-graduation-cap"></i></div>
+                    <h3 class="font-bold">Study Focus</h3><p class="text-xs text-gray-500">Pomodoro timer.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 📢 AD SPACE 2 (MIDDLE) -->
+        <div class="w-full h-20 bg-gray-100 border border-dashed border-gray-300 rounded-lg flex items-center justify-center text-gray-400 text-sm">
+            GOOGLE ADS BANNER 2
+        </div>
+
+        <!-- 2. UTILITY TOOLS -->
+        <section class="tool-category">
+            <h2 class="text-xl font-bold mb-4 flex items-center gap-2"><i class="fa-solid fa-wrench text-orange-500"></i> Utilities</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="tool-card p-5 rounded-xl cursor-pointer" onclick="openTool('qrGen')"><div class="bg-orange-50 w-10 h-10 rounded-lg flex items-center justify-center text-orange-600 mb-2"><i class="fa-solid fa-qrcode"></i></div><h3 class="font-bold">QR Generator</h3></div>
+                <div class="tool-card p-5 rounded-xl cursor-pointer" onclick="openTool('passGen')"><div class="bg-orange-50 w-10 h-10 rounded-lg flex items-center justify-center text-orange-600 mb-2"><i class="fa-solid fa-key"></i></div><h3 class="font-bold">Password Gen</h3></div>
+                <div class="tool-card p-5 rounded-xl cursor-pointer" onclick="openTool('imgConvert')"><div class="bg-orange-50 w-10 h-10 rounded-lg flex items-center justify-center text-orange-600 mb-2"><i class="fa-solid fa-image"></i></div><h3 class="font-bold">Image Converter</h3></div>
+                <div class="tool-card p-5 rounded-xl cursor-pointer" onclick="openTool('bmiCalc')"><div class="bg-orange-50 w-10 h-10 rounded-lg flex items-center justify-center text-orange-600 mb-2"><i class="fa-solid fa-weight-scale"></i></div><h3 class="font-bold">BMI Calculator</h3></div>
+                <div class="tool-card p-5 rounded-xl cursor-pointer" onclick="openTool('ageCalc')"><div class="bg-orange-50 w-10 h-10 rounded-lg flex items-center justify-center text-orange-600 mb-2"><i class="fa-solid fa-cake-candles"></i></div><h3 class="font-bold">Age Calculator</h3></div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- MODALS -->
+    
+    <!-- Tool Modal -->
+    <div id="toolModal" class="modal fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div class="absolute inset-0 bg-black/70 backdrop-blur-sm" onclick="closeTool()"></div>
+        <div class="bg-white w-full max-w-lg rounded-2xl shadow-2xl relative z-10 flex flex-col max-h-[90vh]">
+            <div class="p-4 border-b flex justify-between items-center bg-gray-50">
+                <h3 id="modalTitle" class="text-lg font-bold">Tool</h3>
+                <button onclick="closeTool()" class="text-gray-500 hover:text-red-500"><i class="fa-solid fa-times text-xl"></i></button>
+            </div>
+            <div id="modalContent" class="p-6 overflow-y-auto"></div>
+        </div>
+    </div>
+
+    <!-- Login Modal -->
+    <div id="loginModal" class="modal fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div class="absolute inset-0 bg-black/80" onclick="closeLogin()"></div>
+        <div class="bg-white w-full max-w-sm rounded-2xl shadow-2xl relative z-10 p-6 text-center">
+            <h2 class="text-2xl font-bold mb-4">Login</h2>
+            <input type="text" id="usernameInput" placeholder="Enter your Name" class="w-full p-3 border rounded-lg mb-4 bg-gray-50">
+            <button onclick="performLogin()" class="w-full bg-brand-600 text-white font-bold py-3 rounded-lg">Start Using</button>
+        </div>
+    </div>
+
+    <!-- Premium Modal (Payment) -->
+    <div id="premiumModal" class="modal fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div class="absolute inset-0 bg-black/90 backdrop-blur-sm" onclick="closePremium()"></div>
+        <div class="bg-gradient-to-br from-slate-900 to-slate-800 text-white w-full max-w-md rounded-2xl shadow-2xl relative z-10 p-8 text-center border border-yellow-500/50">
+            <i class="fa-solid fa-crown text-4xl text-yellow-400 mb-4"></i>
+            <h2 class="text-2xl font-bold mb-2">Upgrade to Premium</h2>
+            <p class="text-gray-400 mb-6 text-sm">Remove Ads • Cloud Sync • Priority Support</p>
+            
+            <div class="bg-white/10 p-4 rounded-xl mb-6">
+                <p class="text-sm font-mono text-yellow-300 mb-2">LIFETIME ACCESS</p>
+                <p class="text-3xl font-bold">₹199 <span class="text-sm text-gray-400 font-normal">/ one-time</span></p>
+            </div>
+
+            <!-- PAYMENT BUTTON (UPI) -->
+            <!-- Replace 'yourupi@bank' with YOUR ACTUAL UPI ID -->
+            <a href="upi://pay?pa=gaurav@upi&pn=ChronosTools&am=199&cu=INR" 
+               class="block w-full bg-yellow-500 text-black font-bold py-3 rounded-xl mb-3 hover:bg-yellow-400 transition">
+               Pay via UPI App
+            </a>
+            
+            <button onclick="verifyPayment()" class="text-xs text-gray-400 underline hover:text-white">
+                I have made the payment (Verify)
+            </button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+                </html>
