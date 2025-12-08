@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chronos Ultimate | 60+ Tools Suite</title>
+    <title>Chronos | Ultimate Tool Suite</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
@@ -13,21 +13,17 @@
             theme: {
                 extend: {
                     fontFamily: { sans: ['Outfit', 'sans-serif'] },
-                    colors: {
-                        brand: { 500: '#2563eb', 600: '#1d4ed8', 900: '#1e3a8a' }
-                    }
+                    colors: { brand: { 500: '#2563eb', 600: '#1d4ed8' } }
                 }
             }
         }
     </script>
     <style>
-        body { background-color: #f8fafc; scroll-behavior: smooth; }
+        body { background-color: #f1f5f9; }
         .tool-card { background: white; border: 1px solid #e2e8f0; transition: all 0.2s; cursor: pointer; position: relative; overflow: hidden; }
         .tool-card:hover { transform: translateY(-3px); border-color: #2563eb; box-shadow: 0 10px 20px rgba(37, 99, 235, 0.1); }
         .modal { opacity: 0; visibility: hidden; transition: all 0.2s; }
         .modal.active { opacity: 1; visibility: visible; }
-        .sidebar-closed { transform: translateX(100%); }
-        .sidebar-open { transform: translateX(0); }
     </style>
 </head>
 <body class="text-slate-800">
@@ -35,80 +31,47 @@
     <!-- HEADER -->
     <header class="sticky top-0 z-40 bg-white/90 backdrop-blur border-b border-slate-200">
         <div class="container mx-auto px-4 py-3 flex justify-between items-center">
-            <a href="#" class="flex items-center gap-2 text-2xl font-bold text-brand-900">
-                <i class="fa-solid fa-layer-group text-brand-500"></i> Chronos
-            </a>
-            
-            <div class="hidden md:flex items-center gap-6">
-                <button onclick="openPremiumModal()" class="text-yellow-600 font-bold hover:text-yellow-700"><i class="fa-solid fa-crown"></i> Premium</button>
-                <div id="desktopAuth"><button onclick="openAuthModal()" class="bg-brand-600 text-white px-5 py-2 rounded-full font-bold shadow hover:bg-brand-500">Login</button></div>
+            <div class="flex items-center gap-2 text-2xl font-bold text-blue-900">
+                <i class="fa-solid fa-layer-group text-blue-600"></i> Chronos
             </div>
-            <button onclick="toggleSidebar()" class="md:hidden text-2xl text-slate-700"><i class="fa-solid fa-bars"></i></button>
+            <div class="hidden md:flex gap-4">
+                <button onclick="openPremium()" class="text-yellow-600 font-bold"><i class="fa-solid fa-crown"></i> Premium</button>
+                <div id="authBtn"></div>
+            </div>
+            <button onclick="toggleMenu()" class="md:hidden text-2xl"><i class="fa-solid fa-bars"></i></button>
         </div>
     </header>
 
-    <!-- MOBILE SIDEBAR -->
-    <div id="sidebarOverlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black/50 z-40 hidden"></div>
-    <div id="sidebar" class="fixed top-0 right-0 h-full w-72 bg-white z-50 shadow-2xl sidebar-closed flex flex-col transition-transform duration-300">
-        <div class="p-5 border-b flex justify-between items-center bg-gray-50">
-            <h2 class="font-bold text-lg">Menu</h2>
-            <button onclick="toggleSidebar()" class="text-red-500 text-xl"><i class="fa-solid fa-times"></i></button>
-        </div>
-        <div class="p-5 space-y-4">
-            <div id="mobileAuth"></div>
-            <a href="#" onclick="openPremiumModal()" class="block text-yellow-600 font-bold"><i class="fa-solid fa-crown"></i> Go Premium</a>
-            <hr>
-            <a href="#section-image" onclick="toggleSidebar()">Image Tools</a>
-            <a href="#section-text" onclick="toggleSidebar()">Text Tools</a>
-            <a href="#section-calc" onclick="toggleSidebar()">Calculators</a>
-            <a href="#section-dev" onclick="toggleSidebar()">Developer</a>
-            <a href="#section-unit" onclick="toggleSidebar()">Converters</a>
+    <!-- MOBILE MENU -->
+    <div id="mobileMenu" class="fixed inset-0 bg-black/50 z-50 hidden" onclick="toggleMenu()">
+        <div class="bg-white w-64 h-full p-5" onclick="event.stopPropagation()">
+            <h2 class="font-bold text-xl mb-4">Menu</h2>
+            <div id="mobAuth" class="mb-4"></div>
+            <button onclick="openPremium()" class="block w-full text-left py-2 text-yellow-600 font-bold">Go Premium</button>
+            <a href="mailto:support@chronos.com" class="block py-2 text-slate-600">Contact Support</a>
         </div>
     </div>
 
     <!-- HERO -->
-    <section class="py-12 text-center px-4 bg-gradient-to-b from-blue-50 to-white">
-        <h1 class="text-4xl md:text-5xl font-bold text-slate-900 mb-2">The Ultimate <span class="text-brand-600">Tool Suite</span></h1>
-        <p class="text-slate-500 mb-8">60+ Tools. 100% Free & Working.</p>
-        <div class="max-w-xl mx-auto relative">
+    <section class="py-10 text-center bg-gradient-to-b from-blue-50 to-white px-4">
+        <h1 class="text-4xl font-bold text-slate-900 mb-2">60+ Tools. <span class="text-blue-600">One Place.</span></h1>
+        <div class="max-w-xl mx-auto mt-6 relative">
             <i class="fa-solid fa-search absolute left-4 top-3.5 text-gray-400"></i>
-            <input type="text" id="searchBar" placeholder="Search (e.g., PDF, Wifi Speed, Age)..." class="w-full pl-12 pr-4 py-3 rounded-full border border-gray-300 focus:border-brand-500 outline-none shadow-sm">
+            <input type="text" id="search" placeholder="Search (e.g. BMI, PDF, Wifi)..." class="w-full pl-12 pr-4 py-3 rounded-full border border-gray-300 focus:border-blue-500 outline-none shadow-sm">
         </div>
     </section>
 
-    <!-- TOOLS CONTAINER -->
-    <main class="container mx-auto px-4 pb-24 space-y-12" id="toolsContainer">
+    <!-- ADS SPACE -->
+    <div class="container mx-auto px-4 mb-8">
+        <div class="w-full h-20 bg-gray-100 border border-dashed border-gray-300 rounded flex items-center justify-center text-gray-400 text-sm">GOOGLE ADS</div>
+    </div>
 
-        <!-- 1. IMAGE & MEDIA -->
-        <section id="section-image" class="tool-category">
-            <h2 class="text-xl font-bold mb-4 flex items-center gap-2"><i class="fa-solid fa-image text-blue-500"></i> Image & Media</h2>
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div class="tool-card p-4 rounded-xl" onclick="openTool('imgConvert')"><i class="fa-solid fa-arrows-rotate text-2xl text-blue-500 mb-2"></i><h3 class="font-bold">Image Converter</h3></div>
-                <div class="tool-card p-4 rounded-xl" onclick="openTool('imgFilter')"><i class="fa-solid fa-wand-magic-sparkles text-2xl text-blue-500 mb-2"></i><h3 class="font-bold">Image Filters</h3></div>
-                <div class="tool-card p-4 rounded-xl" onclick="openTool('screenRec')"><i class="fa-solid fa-video text-2xl text-red-500 mb-2"></i><h3 class="font-bold">Screen Recorder</h3></div>
-                <div class="tool-card p-4 rounded-xl" onclick="openTool('audioRec')"><i class="fa-solid fa-microphone-lines text-2xl text-red-500 mb-2"></i><h3 class="font-bold">Audio Recorder</h3></div>
-                <div class="tool-card p-4 rounded-xl" onclick="openTool('imgBase64')"><i class="fa-solid fa-code text-2xl text-blue-500 mb-2"></i><h3 class="font-bold">Image to Base64</h3></div>
-                <div class="tool-card p-4 rounded-xl" onclick="openTool('colorPick')"><i class="fa-solid fa-eye-dropper text-2xl text-blue-500 mb-2"></i><h3 class="font-bold">Color Picker</h3></div>
-            </div>
-        </section>
+    <!-- MAIN TOOLS GRID -->
+    <main class="container mx-auto px-4 pb-24 space-y-10" id="toolsGrid">
 
-        <!-- 2. TEXT & CONTENT -->
-        <section id="section-text" class="tool-category">
-            <h2 class="text-xl font-bold mb-4 flex items-center gap-2"><i class="fa-solid fa-font text-purple-500"></i> Text & Content</h2>
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div class="tool-card p-4 rounded-xl" onclick="openTool('wordCount')"><h3 class="font-bold">Word Counter</h3><p class="text-xs text-gray-500">Chars & Words</p></div>
-                <div class="tool-card p-4 rounded-xl" onclick="openTool('caseConv')"><h3 class="font-bold">Case Converter</h3><p class="text-xs text-gray-500">UPPER/lower</p></div>
-                <div class="tool-card p-4 rounded-xl" onclick="openTool('textToSpeech')"><h3 class="font-bold">Text to Speech</h3><p class="text-xs text-gray-500">AI Reader</p></div>
-                <div class="tool-card p-4 rounded-xl" onclick="openTool('speechToText')"><h3 class="font-bold">Speech to Text</h3><p class="text-xs text-gray-500">Dictation</p></div>
-                <div class="tool-card p-4 rounded-xl" onclick="openTool('removeDup')"><h3 class="font-bold">Remove Duplicates</h3><p class="text-xs text-gray-500">Clean List</p></div>
-                <div class="tool-card p-4 rounded-xl" onclick="openTool('loremGen')"><h3 class="font-bold">Lorem Ipsum</h3><p class="text-xs text-gray-500">Dummy Text</p></div>
-                <div class="tool-card p-4 rounded-xl" onclick="openTool('txtReverse')"><h3 class="font-bold">Text Reverser</h3><p class="text-xs text-gray-500">Flip Text</p></div>
-            </div>
-        </section>
-
-        <!-- 3. MATH & FINANCE -->
-        <section id="section-calc" class="tool-category">
-            <h2 class="text-xl font-bold mb-4 flex items-center gap-2"><i class="fa-solid fa-calculator text-green-500"></i> Math & Finance</h2>
+        <!-- 1. CALCULATORS -->
+        <section class="cat-section">
+            <h2 class="text-xl font-bold mb-4 flex items-center gap-2"><i class="fa-solid fa-calculator text-green-500"></i> Calculators</h2>
             <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div class="tool-card p-4 rounded-xl" onclick="openTool('ageCalc')"><h3 class="font-bold">Age Calculator</h3></div>
                 <div class="tool-card p-4 rounded-xl" onclick="openTool('bmiCalc')"><h3 class="font-bold">BMI Calculator</h3></div>
@@ -116,61 +79,89 @@
                 <div class="tool-card p-4 rounded-xl" onclick="openTool('loanCalc')"><h3 class="font-bold">Loan EMI</h3></div>
                 <div class="tool-card p-4 rounded-xl" onclick="openTool('discountCalc')"><h3 class="font-bold">Discount Calc</h3></div>
                 <div class="tool-card p-4 rounded-xl" onclick="openTool('tipCalc')"><h3 class="font-bold">Tip Calculator</h3></div>
-                <div class="tool-card p-4 rounded-xl" onclick="openTool('percentageCalc')"><h3 class="font-bold">Percentage Calc</h3></div>
-                <div class="tool-card p-4 rounded-xl" onclick="openTool('simpleCalc')"><h3 class="font-bold">Simple Calculator</h3></div>
+                <div class="tool-card p-4 rounded-xl" onclick="openTool('percentageCalc')"><h3 class="font-bold">Percentage</h3></div>
+                <div class="tool-card p-4 rounded-xl" onclick="openTool('salaryCalc')"><h3 class="font-bold">Salary Hourly</h3></div>
+                <div class="tool-card p-4 rounded-xl" onclick="openTool('calorieCalc')"><h3 class="font-bold">Calorie Calc</h3></div>
+                <div class="tool-card p-4 rounded-xl" onclick="openTool('simpleCalc')"><h3 class="font-bold">Simple Math</h3></div>
+            </div>
+        </section>
+
+        <!-- 2. TEXT TOOLS -->
+        <section class="cat-section">
+            <h2 class="text-xl font-bold mb-4 flex items-center gap-2"><i class="fa-solid fa-font text-purple-500"></i> Text Tools</h2>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="tool-card p-4 rounded-xl" onclick="openTool('wordCount')"><h3 class="font-bold">Word Counter</h3></div>
+                <div class="tool-card p-4 rounded-xl" onclick="openTool('caseConv')"><h3 class="font-bold">Case Converter</h3></div>
+                <div class="tool-card p-4 rounded-xl" onclick="openTool('txtReverse')"><h3 class="font-bold">Text Reverser</h3></div>
+                <div class="tool-card p-4 rounded-xl" onclick="openTool('removeDup')"><h3 class="font-bold">Remove Duplicates</h3></div>
+                <div class="tool-card p-4 rounded-xl" onclick="openTool('loremGen')"><h3 class="font-bold">Lorem Ipsum</h3></div>
+                <div class="tool-card p-4 rounded-xl" onclick="openTool('binaryConv')"><h3 class="font-bold">Text to Binary</h3></div>
+                <div class="tool-card p-4 rounded-xl" onclick="openTool('textSpeech')"><h3 class="font-bold">Text to Speech</h3></div>
+                <div class="tool-card p-4 rounded-xl" onclick="openTool('speechText')"><h3 class="font-bold">Speech to Text</h3></div>
+            </div>
+        </section>
+
+        <!-- 3. IMAGE TOOLS -->
+        <section class="cat-section">
+            <h2 class="text-xl font-bold mb-4 flex items-center gap-2"><i class="fa-solid fa-image text-blue-500"></i> Image Tools</h2>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="tool-card p-4 rounded-xl" onclick="openTool('imgConvert')"><h3 class="font-bold">Image Converter</h3></div>
+                <div class="tool-card p-4 rounded-xl" onclick="openTool('imgFilter')"><h3 class="font-bold">Filters/Effects</h3></div>
+                <div class="tool-card p-4 rounded-xl" onclick="openTool('imgBase64')"><h3 class="font-bold">Image to Base64</h3></div>
+                <div class="tool-card p-4 rounded-xl" onclick="openTool('imgFlip')"><h3 class="font-bold">Flip Image</h3></div>
+                <div class="tool-card p-4 rounded-xl" onclick="openTool('imgCompress')"><h3 class="font-bold">Compressor</h3></div>
+                <div class="tool-card p-4 rounded-xl" onclick="openTool('imgResize')"><h3 class="font-bold">Resizer</h3></div>
             </div>
         </section>
 
         <!-- 4. DEVELOPER TOOLS -->
-        <section id="section-dev" class="tool-category">
-            <h2 class="text-xl font-bold mb-4 flex items-center gap-2"><i class="fa-solid fa-code text-orange-500"></i> Developer Tools</h2>
+        <section class="cat-section">
+            <h2 class="text-xl font-bold mb-4 flex items-center gap-2"><i class="fa-solid fa-code text-orange-500"></i> Developer</h2>
             <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div class="tool-card p-4 rounded-xl" onclick="openTool('passGen')"><h3 class="font-bold">Password Gen</h3></div>
                 <div class="tool-card p-4 rounded-xl" onclick="openTool('qrGen')"><h3 class="font-bold">QR Generator</h3></div>
                 <div class="tool-card p-4 rounded-xl" onclick="openTool('uuidGen')"><h3 class="font-bold">UUID Generator</h3></div>
-                <div class="tool-card p-4 rounded-xl" onclick="openTool('jsonFmt')"><h3 class="font-bold">JSON Format</h3></div>
-                <div class="tool-card p-4 rounded-xl" onclick="openTool('base64Txt')"><h3 class="font-bold">Base64 Text</h3></div>
+                <div class="tool-card p-4 rounded-xl" onclick="openTool('jsonFmt')"><h3 class="font-bold">JSON Formatter</h3></div>
                 <div class="tool-card p-4 rounded-xl" onclick="openTool('urlEnc')"><h3 class="font-bold">URL Encoder</h3></div>
-                <div class="tool-card p-4 rounded-xl" onclick="openTool('metaTag')"><h3 class="font-bold">Meta Tag Gen</h3></div>
-                <div class="tool-card p-4 rounded-xl" onclick="openTool('cssShadow')"><h3 class="font-bold">CSS Shadow Gen</h3></div>
+                <div class="tool-card p-4 rounded-xl" onclick="openTool('colorPick')"><h3 class="font-bold">Color Picker</h3></div>
+                <div class="tool-card p-4 rounded-xl" onclick="openTool('cssShadow')"><h3 class="font-bold">CSS Shadow</h3></div>
+                <div class="tool-card p-4 rounded-xl" onclick="openTool('htmlEnc')"><h3 class="font-bold">HTML Entity</h3></div>
             </div>
         </section>
 
         <!-- 5. UNIT CONVERTERS -->
-        <section id="section-unit" class="tool-category">
-            <h2 class="text-xl font-bold mb-4 flex items-center gap-2"><i class="fa-solid fa-ruler-combined text-teal-500"></i> Converters</h2>
+        <section class="cat-section">
+            <h2 class="text-xl font-bold mb-4 flex items-center gap-2"><i class="fa-solid fa-ruler text-teal-500"></i> Converters</h2>
             <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div class="tool-card p-4 rounded-xl" onclick="openTool('lengthConv')"><h3 class="font-bold">Length Converter</h3></div>
-                <div class="tool-card p-4 rounded-xl" onclick="openTool('weightConv')"><h3 class="font-bold">Weight Converter</h3></div>
-                <div class="tool-card p-4 rounded-xl" onclick="openTool('tempConv')"><h3 class="font-bold">Temp Converter</h3></div>
-                <div class="tool-card p-4 rounded-xl" onclick="openTool('dataConv')"><h3 class="font-bold">Data Converter</h3></div>
+                <div class="tool-card p-4 rounded-xl" onclick="openTool('lenConv')"><h3 class="font-bold">Length</h3></div>
+                <div class="tool-card p-4 rounded-xl" onclick="openTool('wgtConv')"><h3 class="font-bold">Weight</h3></div>
+                <div class="tool-card p-4 rounded-xl" onclick="openTool('tempConv')"><h3 class="font-bold">Temperature</h3></div>
+                <div class="tool-card p-4 rounded-xl" onclick="openTool('dataConv')"><h3 class="font-bold">Data Storage</h3></div>
+                <div class="tool-card p-4 rounded-xl" onclick="openTool('speedConv')"><h3 class="font-bold">Speed</h3></div>
+                <div class="tool-card p-4 rounded-xl" onclick="openTool('timeConv')"><h3 class="font-bold">Time Units</h3></div>
             </div>
         </section>
 
-        <!-- 6. DATE & TIME -->
-        <section class="tool-category">
-            <h2 class="text-xl font-bold mb-4 flex items-center gap-2"><i class="fa-regular fa-clock text-indigo-500"></i> Date & Time</h2>
+        <!-- 6. CLOCK & UTILITY -->
+        <section class="cat-section">
+            <h2 class="text-xl font-bold mb-4 flex items-center gap-2"><i class="fa-solid fa-clock text-indigo-500"></i> Time & Utility</h2>
             <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div class="tool-card p-4 rounded-xl" onclick="openTool('stopWatch')"><h3 class="font-bold">Stopwatch</h3></div>
-                <div class="tool-card p-4 rounded-xl" onclick="openTool('clockTool')"><h3 class="font-bold">World Clock</h3></div>
-                <div class="tool-card p-4 rounded-xl" onclick="openTool('daysCalc')"><h3 class="font-bold">Days Calculator</h3><p class="text-xs text-gray-500">Days between dates</p></div>
+                <div class="tool-card p-4 rounded-xl" onclick="openTool('timer')"><h3 class="font-bold">Countdown Timer</h3></div>
+                <div class="tool-card p-4 rounded-xl" onclick="openTool('clock')"><h3 class="font-bold">World Clock</h3></div>
+                <div class="tool-card p-4 rounded-xl" onclick="openTool('deviceInfo')"><h3 class="font-bold">Device Info</h3></div>
+                <div class="tool-card p-4 rounded-xl" onclick="openTool('screenRec')"><h3 class="font-bold">Screen Recorder</h3></div>
+                <div class="tool-card p-4 rounded-xl" onclick="openTool('audioRec')"><h3 class="font-bold">Audio Recorder</h3></div>
+                <div class="tool-card p-4 rounded-xl" onclick="openTool('internetSpeed')"><h3 class="font-bold">Internet Check</h3></div>
+                <div class="tool-card p-4 rounded-xl" onclick="openTool('batteryInfo')"><h3 class="font-bold">Battery Status</h3></div>
             </div>
         </section>
 
     </main>
 
-    <!-- FOOTER -->
-    <footer class="bg-slate-900 text-white py-8 text-center mt-12">
-        <h2 class="text-2xl font-bold mb-2">Chronos Tools</h2>
-        <p class="text-gray-400 text-sm">Simplifying Digital Life.</p>
-        <div class="mt-4 text-xs text-gray-500">
-            <a href="#" class="mx-2 hover:text-white">Privacy</a> | Contact: hupboys@gmail.com
-        </div>
-    </footer>
-
-    <!-- MODALS -->
+    <!-- MODAL POPUP -->
     <div id="toolModal" class="modal fixed inset-0 z-50 flex items-center justify-center p-4">
-        <div class="absolute inset-0 bg-black/70 backdrop-blur-sm" onclick="closeTool()"></div>
+        <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" onclick="closeTool()"></div>
         <div class="bg-white w-full max-w-lg rounded-2xl shadow-2xl relative z-10 flex flex-col max-h-[90vh]">
             <div class="p-4 border-b flex justify-between items-center bg-gray-50">
                 <h3 id="modalTitle" class="text-lg font-bold text-slate-800">Tool</h3>
@@ -180,26 +171,27 @@
         </div>
     </div>
 
-    <!-- Login & Premium Modals (Same as before) -->
-    <div id="loginModal" class="modal fixed inset-0 z-50 flex items-center justify-center p-4">
-        <div class="absolute inset-0 bg-black/80" onclick="closeLogin()"></div>
-        <div class="bg-white w-full max-w-sm rounded-2xl p-6 text-center z-10">
+    <!-- AUTH MODAL -->
+    <div id="authModal" class="modal fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div class="absolute inset-0 bg-black/80" onclick="closeAuth()"></div>
+        <div class="bg-white w-full max-w-sm rounded-2xl p-6 relative z-10">
             <h2 class="text-2xl font-bold mb-4">Login</h2>
             <input id="uName" placeholder="Name" class="w-full p-2 border rounded mb-2">
             <input id="uEmail" placeholder="Email" class="w-full p-2 border rounded mb-2">
-            <button onclick="performLogin()" class="w-full bg-brand-600 text-white py-2 rounded font-bold">Start</button>
+            <input id="uPass" type="password" placeholder="Password" class="w-full p-2 border rounded mb-4">
+            <button onclick="login()" class="w-full bg-blue-600 text-white py-2 rounded font-bold">Start</button>
         </div>
     </div>
 
-    <div id="premiumModal" class="modal fixed inset-0 z-50 flex items-center justify-center p-4">
-        <div class="absolute inset-0 bg-black/90" onclick="closePremium()"></div>
-        <div class="bg-gradient-to-br from-slate-900 to-slate-800 text-white w-full max-w-md rounded-2xl p-8 text-center z-10 border border-yellow-500">
+    <!-- PREMIUM MODAL -->
+    <div id="premModal" class="modal fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div class="absolute inset-0 bg-black/90" onclick="closePrem()"></div>
+        <div class="bg-gradient-to-br from-slate-900 to-slate-800 text-white w-full max-w-md rounded-2xl p-8 text-center relative z-10 border border-yellow-500">
             <i class="fa-solid fa-crown text-4xl text-yellow-400 mb-4"></i>
-            <h2 class="text-2xl font-bold">Go Premium</h2>
-            <p class="text-gray-400 mb-4">Remove Ads & Unlock Limits</p>
-            <p class="text-3xl font-bold mb-6">₹199 <span class="text-sm font-normal">/ Lifetime</span></p>
-            <a href="upi://pay?pa=YOUR_UPI@okaxis&pn=Chronos&am=199" class="block w-full bg-yellow-500 text-black font-bold py-3 rounded-xl mb-3">Pay via UPI</a>
-            <button onclick="verifyPayment()" class="text-xs text-gray-400 underline">Verify Payment</button>
+            <h2 class="text-2xl font-bold">Upgrade to Premium</h2>
+            <p class="text-3xl font-bold my-4">₹199 <span class="text-sm">/ Lifetime</span></p>
+            <a href="upi://pay?pa=YOUR_UPI@okaxis&pn=Chronos&am=199" class="block w-full bg-yellow-500 text-black font-bold py-3 rounded mb-2">Pay via UPI</a>
+            <button onclick="verifyPay()" class="text-xs underline text-gray-400">Verify Payment</button>
         </div>
     </div>
 
